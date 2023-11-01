@@ -1,16 +1,22 @@
 {
   "name": "@gopasswordless/sdk",
-  "version": "1.0.0",
+  "repository": "https://github.com/gopasswordless/sdk.git",
+  "version": "0.9.57",
   "description": "",
+  "source": "./src/index.ts",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "parcel build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@parcel/packager-ts": "^2.10.1",
+    "@parcel/transformer-typescript-types": "^2.10.1",
     "@simplewebauthn/typescript-types": "^8.3.4",
+    "parcel": "^2.10.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {

@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   startAuthentication,
   startRegistration,
@@ -6,7 +5,7 @@ import {
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const uri = "http://localhost:3000/v1";
-const appId = "my-app-id";
+const appId = "b9199050-5fdc-47c5-a317-89be8fad3aa1";
 
 export type Tokens = {
   accessToken: string;
@@ -22,53 +21,68 @@ export type TokenClaims = {
 
 export const register = async (username: string): Promise<Tokens> => {
   // Get the registration options from the server
-  const registrationOptions = await axios.post(
+  const registrationOptions = await fetch(
     `${uri}/auth/${appId}/registration/options`,
-    { username }
-  );
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username }),
+    }
+  ).then((res) => res.json());
 
   let attResp;
 
   try {
-    attResp = await startRegistration(registrationOptions.data);
+    attResp = await startRegistration(registrationOptions);
+    console.log(attResp);
   } catch (err) {
     console.error(err);
     throw err;
   }
 
   // Send the registration response to the server
-  const verificationResponse = await axios.post(
+  const verificationResponse = await fetch(
     `${uri}/auth/${appId}/registration/verify`,
-    attResp
-  );
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(attResp),
+    }
+  ).then((res) => res.json());
 
-  const verificationResponseJSON = verificationResponse.data as Tokens;
+  const verificationResponseJSON = verificationResponse as Tokens;
 
   return verificationResponseJSON;
 };
 
 export const login = async (username: string): Promise<Tokens> => {
   // Get the login options from the server
-  const loginOptions = await axios.post(`${uri}/auth/${appId}/login/options`, {
-    username,
-  });
+  const loginOptions = await fetch(`${uri}/auth/${appId}/login/options`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username }),
+  }).then((res) => res.json());
 
   let attResp;
 
   try {
-    attResp = await startAuthentication(loginOptions.data);
+    attResp = await startAuthentication(loginOptions);
   } catch (err) {
     console.error(err);
     throw err;
   }
 
   // Send the login response to the server
-  const verificationResponse = await axios.post(
+  const verificationResponse = await fetch(
     `${uri}/auth/${appId}/login/verify`,
-    attResp
-  );
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(attResp),
+    }
+  ).then((res) => res.json());
 
-  const verificationResponseJSON = verificationResponse.data as Tokens;
+  const verificationResponseJSON = verificationResponse as Tokens;
 
   return verificationResponseJSON;
 };
