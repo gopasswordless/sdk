@@ -1,0 +1,21 @@
+{
+  "name": "@gopasswordless/sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@simplewebauthn/typescript-types": "^8.3.4",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@simplewebauthn/browser": "^8.3.4",
+    "axios": "^1.6.0",
+    "jose": "^5.0.1"
+  }
+}
