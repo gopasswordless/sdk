@@ -5,7 +5,6 @@ import {
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const uri = "http://localhost:3000/v1";
-const appId = "b9199050-5fdc-47c5-a317-89be8fad3aa1";
 
 export type Tokens = {
   accessToken: string;
@@ -19,7 +18,10 @@ export type TokenClaims = {
   exp: number;
 };
 
-export const register = async (username: string): Promise<Tokens> => {
+export const register = async (
+  appId: string,
+  username: string
+): Promise<Tokens> => {
   // Get the registration options from the server
   const registrationOptions = await fetch(
     `${uri}/auth/${appId}/registration/options`,
@@ -34,7 +36,6 @@ export const register = async (username: string): Promise<Tokens> => {
 
   try {
     attResp = await startRegistration(registrationOptions);
-    console.log(attResp);
   } catch (err) {
     console.error(err);
     throw err;
@@ -55,7 +56,10 @@ export const register = async (username: string): Promise<Tokens> => {
   return verificationResponseJSON;
 };
 
-export const login = async (username: string): Promise<Tokens> => {
+export const login = async (
+  appId: string,
+  username: string
+): Promise<Tokens> => {
   // Get the login options from the server
   const loginOptions = await fetch(`${uri}/auth/${appId}/login/options`, {
     method: "POST",
@@ -87,7 +91,10 @@ export const login = async (username: string): Promise<Tokens> => {
   return verificationResponseJSON;
 };
 
-export const validate = async (token: string): Promise<TokenClaims> => {
+export const validate = async (
+  appId: string,
+  token: string
+): Promise<TokenClaims> => {
   const JWKS = createRemoteJWKSet(
     new URL(`${uri}/auth/${appId}/.well-known/jwks.json`)
   );

@@ -1,7 +1,7 @@
 {
   "name": "@gopasswordless/sdk",
   "repository": "https://github.com/gopasswordless/sdk.git",
-  "version": "0.9.57",
+  "version": "0.9.7",
   "description": "",
   "source": "./src/index.ts",
   "main": "./dist/index.js",
