@@ -9,7 +9,8 @@ function App() {
           onClick={() =>
             register(
               "b9199050-5fdc-47c5-a317-89be8fad3aa1",
-              "GoPasswordless Demo"
+              "GoPasswordless Demo",
+              "http://localhost:8080/v1"
             )
           }
         >
@@ -17,7 +18,11 @@ function App() {
         </button>
         <button
           onClick={() =>
-            login("b9199050-5fdc-47c5-a317-89be8fad3aa1", "GoPasswordless Demo")
+            login(
+              "b9199050-5fdc-47c5-a317-89be8fad3aa1",
+              "GoPasswordless Demo",
+              "http://localhost:8080/v1"
+            )
           }
         >
           Login
