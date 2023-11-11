@@ -1,11 +1,12 @@
 {
   "name": "@gopasswordless/sdk",
   "repository": "https://github.com/gopasswordless/sdk.git",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "description": "",
   "source": "./src/index.ts",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "parcel build",
     "test": "echo \"Error: no test specified\" && exit 1"

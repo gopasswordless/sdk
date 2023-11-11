@@ -2,12 +2,12 @@ import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
-import { Tokens } from "../types";
+import { Tokens } from "../types/index.js";
 
 export const register = async (
   appId: string,
   username: string,
-  uri: string = "http://localhost:3000/v1"
+  uri: string = "https://api.gopasswordless.dev/v1"
 ): Promise<Tokens> => {
   // Get the registration options from the server
   const registrationOptions = await fetch(
@@ -49,7 +49,7 @@ export const register = async (
 export const login = async (
   appId: string,
   username: string,
-  uri: string = "http://localhost:3000/v1"
+  uri: string = "https://api.gopasswordless.dev/v1"
 ): Promise<Tokens> => {
   // Get the login options from the server
   const loginOptions = await fetch(`${uri}/auth/${appId}/login/options`, {

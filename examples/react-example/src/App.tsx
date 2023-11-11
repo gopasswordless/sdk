@@ -1,35 +1,30 @@
-import "./App.css";
 import { register, login } from "@gopasswordless/sdk";
 
-function App() {
+export const App = (): JSX.Element => {
+  const passwordlessRegister = async (email: string): Promise<string> => {
+    const { accessToken } = await register("<your_app_id>", email);
+
+    return accessToken;
+  };
+
+  const passwordlessLogin = async (email: string): Promise<string> => {
+    const { accessToken } = await login("<your_app_id>", email);
+
+    return accessToken;
+  };
+
   return (
     <div className="App">
       <header className="App-header">
-        <button
-          onClick={() =>
-            register(
-              "b9199050-5fdc-47c5-a317-89be8fad3aa1",
-              "GoPasswordless Demo",
-              "http://localhost:8080/v1"
-            )
-          }
-        >
+        <button onClick={() => passwordlessRegister("demo@gopasswordless.dev")}>
           Register
         </button>
-        <button
-          onClick={() =>
-            login(
-              "b9199050-5fdc-47c5-a317-89be8fad3aa1",
-              "GoPasswordless Demo",
-              "http://localhost:8080/v1"
-            )
-          }
-        >
+        <button onClick={() => passwordlessLogin("demo@gopasswordless.dev")}>
           Login
         </button>
       </header>
     </div>
   );
-}
+};
 
 export default App;
