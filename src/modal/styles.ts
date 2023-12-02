@@ -13,9 +13,17 @@ export const modalStyle = {
   transform: "translateY(-10%)", // Start slightly above the final position
 };
 
-export const openModalStyle = {};
+export const openModalStyle = {
+  visibility: "visible", // Make the modal visible
+  opacity: "1", // Fully opaque
+  transform: "translateY(0)", // Move to final position
+};
 
-export const closedModalStyle = {};
+export const closedModalStyle = {
+  visibility: "hidden",
+  opacity: "0",
+  transform: "translateY(-10%)", // Move slightly up
+};
 
 export interface ModalContentStyleProps {
   theme: Theme;

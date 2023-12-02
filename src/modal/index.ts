@@ -5,11 +5,13 @@ import {
 } from "../browser/index";
 import {
   Theme,
+  closedModalStyle,
   modalButtonStyle,
   modalContentStyle,
   modalInputStyle,
   modalLinkStyle,
   modalStyle,
+  openModalStyle,
 } from "./styles";
 
 interface GoPasswordlessModalState {
@@ -210,7 +212,7 @@ export class GoPasswordlessModal {
     this.state.accessToken = accessToken;
 
     // close the modal
-    this.modal?.remove();
+    this.applyStyles(this.modal, closedModalStyle);
   }
 
   private async handleLoginSubmit() {
@@ -238,7 +240,7 @@ export class GoPasswordlessModal {
       this.state.accessToken = accessToken;
 
       // close the modal
-      this.modal?.remove();
+      this.applyStyles(this.modal, closedModalStyle);
     }
   }
 
@@ -255,7 +257,7 @@ export class GoPasswordlessModal {
         <button id="submit">Continue</button>
         <p>Already have an account? <span id="signup">Login</a></p>
       </div>`;
-    this.modal.style.display = "block";
+    this.applyStyles(this.modal, openModalStyle);
 
     // Apply styles to input and button
     const usernameInput = this.modal.querySelector("#username") as HTMLElement;
@@ -293,7 +295,7 @@ export class GoPasswordlessModal {
         <button id="submit">Continue</button>
         <p>Don't have an account? <span id="signup">Sign up</a></p>
       </div>`;
-    this.modal.style.display = "block";
+    this.applyStyles(this.modal, openModalStyle);
 
     // Apply styles to input and button
     const usernameInput = this.modal.querySelector("#username") as HTMLElement;
