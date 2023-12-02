@@ -2,13 +2,12 @@ import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
-import { Tokens } from "../types/index.js";
 
-export const register = async (
+export const beginRegistration = async (
   appId: string,
   username: string,
   uri: string = "https://api.gopasswordless.dev/v1"
-): Promise<Tokens> => {
+): Promise<string> => {
   // Get the registration options from the server
   const registrationOptions = await fetch(
     `${uri}/auth/${appId}/registration/options`,
@@ -41,16 +40,52 @@ export const register = async (
     }
   ).then((res) => res.json());
 
-  const verificationResponseJSON = verificationResponse as Tokens;
+  if (verificationResponse.signupToken) {
+    return verificationResponse.signupToken;
+  } else {
+    throw new Error("Registration failed");
+  }
+};
 
-  return verificationResponseJSON;
+export const completeRegistration = async (
+  appId: string,
+  username: string,
+  code: string,
+  signupToken: string,
+  uri: string = "https://api.gopasswordless.dev/v1"
+): Promise<{ accessToken: string }> => {
+  const verificationResponse = await fetch(`${uri}/auth/${appId}/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      otp: code,
+    }),
+  }).then((res) => res.json());
+
+  if (verificationResponse.success) {
+    const { accessToken } = await fetch(
+      `${uri}/auth/${appId}/registration/complete`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          signupToken,
+        }),
+      }
+    ).then((res) => res.json());
+
+    return { accessToken };
+  } else {
+    throw new Error("Verification failed");
+  }
 };
 
 export const login = async (
   appId: string,
   username: string,
   uri: string = "https://api.gopasswordless.dev/v1"
-): Promise<Tokens> => {
+): Promise<{ accessToken: string }> => {
   // Get the login options from the server
   const loginOptions = await fetch(`${uri}/auth/${appId}/login/options`, {
     method: "POST",
@@ -68,19 +103,14 @@ export const login = async (
   }
 
   // Send the login response to the server
-  const verificationResponse = await fetch(
-    `${uri}/auth/${appId}/login/verify`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username,
-        data: attResp,
-      }),
-    }
-  ).then((res) => res.json());
+  const { accessToken } = await fetch(`${uri}/auth/${appId}/login/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      data: attResp,
+    }),
+  }).then((res) => res.json());
 
-  const verificationResponseJSON = verificationResponse as Tokens;
-
-  return verificationResponseJSON;
+  return { accessToken };
 };
