@@ -1,4 +1,7 @@
-import { startRegistration } from "@simplewebauthn/browser";
+import {
+  startAuthentication,
+  startRegistration,
+} from "@simplewebauthn/browser";
 
 export const beginRegistration = async (
   appId: string,
@@ -50,7 +53,7 @@ export const completeRegistration = async (
   code: string,
   signupToken: string,
   uri: string = "https://api.gopasswordless.dev/v1"
-): Promise<void> => {
+): Promise<{ accessToken: string }> => {
   const verificationResponse = await fetch(`${uri}/auth/${appId}/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -72,10 +75,44 @@ export const completeRegistration = async (
       }
     ).then((res) => res.json());
 
-    console.log(accessToken);
+    return { accessToken };
   } else {
     throw new Error("Verification failed");
   }
+};
+
+export const login = async (
+  appId: string,
+  username: string,
+  uri: string = "https://api.gopasswordless.dev/v1"
+): Promise<{ accessToken: string }> => {
+  // Get the login options from the server
+  const loginOptions = await fetch(`${uri}/auth/${appId}/login/options`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username }),
+  }).then((res) => res.json());
+
+  let attResp;
+
+  try {
+    attResp = await startAuthentication(loginOptions);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+
+  // Send the login response to the server
+  const { accessToken } = await fetch(`${uri}/auth/${appId}/login/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      data: attResp,
+    }),
+  }).then((res) => res.json());
+
+  return { accessToken };
 };
 
 interface GoPasswordlessModalState {
@@ -85,6 +122,7 @@ interface GoPasswordlessModalState {
   uri: string;
   username?: string;
   signupToken?: string;
+  accessToken?: string;
 }
 
 const modalStyle = {
@@ -142,6 +180,8 @@ export interface GoPasswordlessModalOptions {
   appId: string;
   appName: string; // TODO: fetch this from the server
   uri?: string;
+  onSignupSuccess?: ({ accessToken }: { accessToken: string }) => void;
+  onLoginSuccess?: ({ accessToken }: { accessToken: string }) => void;
 }
 
 export class GoPasswordlessModal {
@@ -153,12 +193,22 @@ export class GoPasswordlessModal {
   };
 
   private modal: HTMLElement | null = null;
+  private onSignupSuccess?: ({ accessToken }: { accessToken: string }) => void;
+  private onLoginSuccess?: ({ accessToken }: { accessToken: string }) => void;
 
-  constructor({ appId, appName, uri }: GoPasswordlessModalOptions) {
+  constructor({
+    appId,
+    appName,
+    uri,
+    onLoginSuccess,
+    onSignupSuccess,
+  }: GoPasswordlessModalOptions) {
     this.createModal();
     this.state.appId = appId;
     this.state.appName = appName;
     this.state.uri = uri || "https://api.gopasswordless.dev/v1";
+    this.onLoginSuccess = onLoginSuccess;
+    this.onSignupSuccess = onSignupSuccess;
   }
 
   private createModal() {
@@ -277,7 +327,7 @@ export class GoPasswordlessModal {
       .join("");
 
     // Submit verification code
-    await completeRegistration(
+    const { accessToken } = await completeRegistration(
       this.state.appId,
       username,
       code,
@@ -286,9 +336,45 @@ export class GoPasswordlessModal {
     );
 
     this.state.step = "complete";
+
+    if (this.onSignupSuccess) {
+      this.onSignupSuccess({ accessToken });
+    }
+
+    this.state.accessToken = accessToken;
+
+    // close the modal
+    this.modal?.remove();
   }
 
-  private async handleLoginSubmit() {}
+  private async handleLoginSubmit() {
+    if (!this.modal) return;
+    const usernameInput = this.modal.querySelector(
+      "#username"
+    ) as HTMLInputElement;
+    if (usernameInput) {
+      const username = usernameInput.value;
+      this.state.username = username;
+
+      // WebAuthn login
+      const { accessToken } = await login(
+        this.state.appId,
+        username,
+        this.state.uri
+      );
+
+      this.state.step = "complete";
+
+      if (this.onLoginSuccess) {
+        this.onLoginSuccess({ accessToken });
+      }
+
+      this.state.accessToken = accessToken;
+
+      // close the modal
+      this.modal?.remove();
+    }
+  }
 
   startRegistration() {
     if (!this.modal) return;

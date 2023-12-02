@@ -7,6 +7,9 @@ export const App = (): JSX.Element => {
       appId: "b9199050-5fdc-47c5-a317-89be8fad3aa1",
       appName: "GoPasswordless Demo",
       uri: "http://localhost:8080/v1",
+      onSignupSuccess: ({ accessToken }) => {
+        console.log(accessToken);
+      },
     });
     modal.startRegistration();
   };
@@ -16,6 +19,9 @@ export const App = (): JSX.Element => {
       appId: "b9199050-5fdc-47c5-a317-89be8fad3aa1",
       appName: "GoPasswordless Demo",
       uri: "http://localhost:8080/v1",
+      onLoginSuccess: ({ accessToken }) => {
+        console.log(accessToken);
+      },
     });
     modal.startLogin();
   };
