@@ -1,4 +1,8 @@
-# README for GoPasswordlessModal Library
+# GoPasswordless SDK
+
+GoPasswordless SDK
+
+[![npm version](https://badge.fury.io/js/%40gopasswordless%2Fsdk.svg)](https://badge.fury.io/js/%40gopasswordless%2Fsdk)
 
 ## Overview
 
