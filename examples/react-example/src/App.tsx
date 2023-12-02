@@ -1,28 +1,35 @@
-import { register, login } from "@gopasswordless/sdk";
+import { GoPasswordlessModal } from "./modal";
+import { useEffect, useState } from "react";
 
 export const App = (): JSX.Element => {
-  const passwordlessRegister = async (email: string): Promise<string> => {
-    const { accessToken } = await register("<your_app_id>", email);
-
-    return accessToken;
+  const handleRegistration = () => {
+    const modal = new GoPasswordlessModal({
+      appId: "b9199050-5fdc-47c5-a317-89be8fad3aa1",
+      appName: "GoPasswordless Demo",
+      uri: "http://localhost:8080/v1",
+      onSignupSuccess: ({ accessToken }) => {
+        console.log(accessToken);
+      },
+    });
+    modal.startRegistration();
   };
 
-  const passwordlessLogin = async (email: string): Promise<string> => {
-    const { accessToken } = await login("<your_app_id>", email);
-
-    return accessToken;
+  const handleLogin = () => {
+    const modal = new GoPasswordlessModal({
+      appId: "b9199050-5fdc-47c5-a317-89be8fad3aa1",
+      appName: "GoPasswordless Demo",
+      uri: "http://localhost:8080/v1",
+      onLoginSuccess: ({ accessToken }) => {
+        console.log(accessToken);
+      },
+    });
+    modal.startLogin();
   };
 
   return (
     <div className="App">
-      <header className="App-header">
-        <button onClick={() => passwordlessRegister("demo@gopasswordless.dev")}>
-          Register
-        </button>
-        <button onClick={() => passwordlessLogin("demo@gopasswordless.dev")}>
-          Login
-        </button>
-      </header>
+      <button onClick={handleRegistration}>Register</button>
+      <button onClick={handleLogin}>Login</button>
     </div>
   );
 };
