@@ -1,4 +1,4 @@
-import { GoPasswordlessModal } from "./sdk";
+import { GoPasswordlessModal } from "@gopasswordless/sdk";
 import { useEffect, useState } from "react";
 
 export const App = (): JSX.Element => {
