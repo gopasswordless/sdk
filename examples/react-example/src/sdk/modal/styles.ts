@@ -56,7 +56,7 @@ export const modalInputStyle = ({ theme }: ModalInputStyleProps) => ({
   borderRadius: "4px",
   border: "1px solid #555", // Subtle border
   backgroundColor: "rgba(255, 255, 255, 0.1)", // Slightly transparent background
-  color: theme === "dark" ? "rgb(220, 220, 220)" : "#ffffff", // Text color
+  color: theme === "dark" ? "rgb(220, 220, 220)" : "#000000", // Text color
   fontSize: "16px", // Readable font size
 });
 
@@ -76,6 +76,28 @@ export const modalButtonStyle = ({ theme }: ModalButtonStyleProps) => ({
   cursor: "pointer",
   margin: "10px 0",
   boxShadow: "0 2px 4px 0 rgba(0,0,0,0.2)", // Subtle shadow
+});
+
+export interface ModalButtonStyleLoadingProps {
+  theme: Theme;
+}
+
+export const modalButtonStyleLoading = ({
+  theme,
+}: ModalButtonStyleLoadingProps) => ({
+  padding: "12px",
+  width: "100%",
+  boxSizing: "border-box",
+  borderRadius: "4px",
+  border: "none",
+  backgroundColor: "#0070f4", // A purple-like color
+  color: "white",
+  fontSize: "16px",
+  cursor: "pointer",
+  margin: "10px 0",
+  boxShadow: "0 2px 4px 0 rgba(0,0,0,0.2)", // Subtle shadow
+  opacity: "0.5",
+  pointerEvents: "none",
 });
 
 export interface ModalLinkStyleProps {

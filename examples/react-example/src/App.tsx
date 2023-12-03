@@ -1,4 +1,4 @@
-import { GoPasswordlessModal } from "@gopasswordless/sdk";
+import { GoPasswordlessModal } from "./sdk";
 import { useEffect, useState } from "react";
 
 export const App = (): JSX.Element => {
@@ -13,12 +13,14 @@ export const App = (): JSX.Element => {
       onSignupSuccess: ({ accessToken }) => {
         console.log(accessToken);
       },
+      onLoginSuccess: ({ accessToken }) => {
+        console.log(accessToken);
+      },
     });
     setModal(modal);
   }, []);
 
   const handleRegistration = () => {
-    console.log(modal);
     if (!modal) return;
     modal.startRegistration();
   };
@@ -28,10 +30,16 @@ export const App = (): JSX.Element => {
     modal.startLogin();
   };
 
+  const handleClose = () => {
+    if (!modal) return;
+    modal.close();
+  };
+
   return (
     <div className="App">
       <button onClick={handleRegistration}>Register</button>
       <button onClick={handleLogin}>Login</button>
+      <button onClick={handleClose}>Close</button>
     </div>
   );
 };
