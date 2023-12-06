@@ -3,26 +3,25 @@ export type Theme = "light" | "dark" | "custom";
 export const modalStyle = {
   visibility: "hidden",
   opacity: "0",
-  position: "fixed",
+  position: "absolute",
   zIndex: "1000",
   left: "0",
   top: "0",
   width: "100%",
+  height: "100vh",
   overflow: "auto",
-  transition: "opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease", // Transition effects
-  transform: "translateY(-10%)", // Start slightly above the final position
+  backgroundColor: "rgba(0,0,0,0.4)",
+  backdropFilter: "blur(5px)",
 };
 
 export const openModalStyle = {
-  visibility: "visible", // Make the modal visible
-  opacity: "1", // Fully opaque
-  transform: "translateY(0)", // Move to final position
+  visibility: "visible",
+  opacity: "1",
 };
 
 export const closedModalStyle = {
   visibility: "hidden",
   opacity: "0",
-  transform: "translateY(-10%)", // Move slightly up
 };
 
 export interface ModalContentStyleProps {
@@ -42,7 +41,16 @@ export const modalContentStyle = ({ theme }: ModalContentStyleProps) => ({
   borderRadius: "5px",
   color: theme === "dark" ? "#ffffff90" : "rgb(0 0 0 / 90%);",
   textAlign: "center",
+  visibility: "hidden",
+  opacity: "0",
+  transform: "scale(0.9)", // Start with the modal slightly scaled down
+  animation: "modalFadeInScaleUp 0.5s ease-out forwards", // Animation
 });
+
+export const openModalContentStyle = {
+  visibility: "visible",
+  opacity: "1",
+};
 
 export interface ModalInputStyleProps {
   theme: Theme;

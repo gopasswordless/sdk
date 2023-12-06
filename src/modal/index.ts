@@ -12,6 +12,8 @@ import {
   modalInputStyle,
   modalLinkStyle,
   modalStyle,
+  openModalContentStyle,
+  openModalStyle,
 } from "./styles";
 
 interface GoPasswordlessModalState {
@@ -52,6 +54,7 @@ export class GoPasswordlessModal {
   private linkStyle = modalLinkStyle({ theme: "light" });
 
   private modal: HTMLElement | null = null;
+  private modalContent: HTMLElement | null = null;
   private shadowRoot: ShadowRoot | null = null;
 
   private onSignupSuccess?: ({ accessToken }: { accessToken: string }) => void;
@@ -93,22 +96,43 @@ export class GoPasswordlessModal {
     this.modal = document.createElement("div");
     this.modal.id = "go-passwordless-modal";
 
+    // Regsiter listener to close modal on all clicks outside the modal
+    this.modal.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (target.id === "go-passwordless-modal") {
+        this.close();
+      }
+    });
+
     this.shadowRoot = this.modal.attachShadow({ mode: "open" });
 
-    // Use a style element to add styles to the shadow DOM
+    // attach styles
     const styleEl = document.createElement("style");
     styleEl.textContent = `
-      ${modalStyle}
-      ${this.contentStyle}
-      ${this.inputStyle}
-      ${this.buttonStyle}
-      ${this.linkStyle}
+      @keyframes modalFadeInScaleUp {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
     `;
     this.shadowRoot.appendChild(styleEl);
+
+    // Clicks on the modal should not close the modal
+    this.shadowRoot.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+
+    this.applyStyles(this.modal, modalStyle);
 
     const modalContent = document.createElement("div");
     modalContent.className = "modal-content";
     this.applyStyles(modalContent, this.contentStyle);
+    this.modalContent = modalContent;
 
     const modalBody = document.createElement("div");
     modalBody.id = "modal-body";
@@ -296,10 +320,17 @@ export class GoPasswordlessModal {
   startRegistration() {
     this.createModal();
     if (!this.modal) return;
+    if (!this.modalContent) return;
 
     // Access shadow root
     const shadowRoot = this.shadowRoot;
     if (!shadowRoot) return;
+
+    // Apply the visible style to the modal
+    this.applyStyles(this.modal, openModalStyle);
+
+    // Apply the visible style to the modal content
+    this.applyStyles(this.modalContent, openModalContentStyle);
 
     const modalBody = shadowRoot.querySelector("#modal-body");
     if (!modalBody) return;
@@ -342,10 +373,17 @@ export class GoPasswordlessModal {
   startLogin() {
     this.createModal();
     if (!this.modal) return;
+    if (!this.modalContent) return;
 
     // Access shadow root
     const shadowRoot = this.shadowRoot;
     if (!shadowRoot) return;
+
+    // Apply the visible style to the modal
+    this.applyStyles(this.modal, openModalStyle);
+
+    // Apply the visible style to the modal content
+    this.applyStyles(this.modalContent, openModalContentStyle);
 
     const modalBody = shadowRoot.querySelector("#modal-body");
     if (!modalBody) return;
