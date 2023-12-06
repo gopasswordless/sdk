@@ -18,6 +18,13 @@ export const beginRegistration = async (
     }
   ).then((res) => res.json());
 
+  if (
+    registrationOptions.statusCode &&
+    registrationOptions.statusCode !== 201
+  ) {
+    throw new Error(registrationOptions.message);
+  }
+
   let attResp;
 
   try {
@@ -39,6 +46,13 @@ export const beginRegistration = async (
       }),
     }
   ).then((res) => res.json());
+
+  if (
+    verificationResponse.statusCode &&
+    verificationResponse.statusCode !== 200
+  ) {
+    throw new Error(verificationResponse.message);
+  }
 
   if (verificationResponse.signupToken) {
     return verificationResponse.signupToken;
@@ -63,19 +77,27 @@ export const completeRegistration = async (
     }),
   }).then((res) => res.json());
 
-  if (verificationResponse.success) {
-    const { accessToken } = await fetch(
-      `${uri}/auth/${appId}/registration/complete`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          signupToken,
-        }),
-      }
-    ).then((res) => res.json());
+  if (
+    verificationResponse.statusCode &&
+    verificationResponse.statusCode !== 200
+  ) {
+    throw new Error(verificationResponse.message);
+  }
 
-    return { accessToken };
+  if (verificationResponse.success) {
+    const resp = await fetch(`${uri}/auth/${appId}/registration/complete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        signupToken,
+      }),
+    }).then((res) => res.json());
+
+    if (resp.statusCode && resp.statusCode !== 200) {
+      throw new Error(resp.message);
+    }
+
+    return { accessToken: resp.accessToken };
   } else {
     throw new Error("Verification failed");
   }
@@ -93,6 +115,10 @@ export const login = async (
     body: JSON.stringify({ username }),
   }).then((res) => res.json());
 
+  if (loginOptions.statusCode) {
+    throw new Error(loginOptions.message);
+  }
+
   let attResp;
 
   try {
@@ -103,7 +129,7 @@ export const login = async (
   }
 
   // Send the login response to the server
-  const { accessToken } = await fetch(`${uri}/auth/${appId}/login/verify`, {
+  const resp = await fetch(`${uri}/auth/${appId}/login/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -112,5 +138,9 @@ export const login = async (
     }),
   }).then((res) => res.json());
 
-  return { accessToken };
+  if (resp.statusCode) {
+    throw new Error(resp.message);
+  }
+
+  return { accessToken: resp.accessToken };
 };

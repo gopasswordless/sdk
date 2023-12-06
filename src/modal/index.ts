@@ -24,9 +24,11 @@ interface GoPasswordlessModalState {
   appName: string;
   uri: string;
   isLoading: boolean;
+  isError: boolean;
   username?: string;
   signupToken?: string;
   accessToken?: string;
+  error: Error | undefined;
 }
 
 export interface GoPasswordlessModalOptions {
@@ -47,6 +49,8 @@ export class GoPasswordlessModal {
     theme: "light",
     logoUri: "",
     isLoading: false,
+    isError: false,
+    error: undefined,
   };
   private contentStyle = modalContentStyle({ theme: "light" });
   private inputStyle = modalInputStyle({ theme: "light" });
@@ -148,6 +152,27 @@ export class GoPasswordlessModal {
     }
   }
 
+  private displayError() {
+    if (!this.modal) return;
+    const shadowRoot = this.shadowRoot;
+    if (!shadowRoot) return;
+    const modalBody = shadowRoot.querySelector("#modal-body");
+    if (!modalBody) return;
+    // If there is no error element, create one and append it to the modal body
+    // otherwise, just update the error message
+    if (!shadowRoot.querySelector("#error")) {
+      const errorEl = document.createElement("p");
+      errorEl.id = "error";
+      errorEl.textContent = this.state.error?.message || "";
+      modalBody.appendChild(errorEl);
+    } else {
+      const errorEl = shadowRoot.querySelector("#error");
+      if (errorEl) {
+        errorEl.textContent = this.state.error?.message || "";
+      }
+    }
+  }
+
   private async handleRegistrationSubmit() {
     if (!this.modal) return;
 
@@ -172,19 +197,22 @@ export class GoPasswordlessModal {
       this.state.username = username;
 
       // WebAuthn registration
-      this.state.signupToken = await beginRegistration(
-        this.state.appId,
-        username,
-        this.state.uri
-      );
+      try {
+        this.state.signupToken = await beginRegistration(
+          this.state.appId,
+          username,
+          this.state.uri
+        );
 
-      // Next step is to verify email or phone number before the user can login
-      this.state.step = "verify";
+        console.log("signup token", this.state.signupToken);
 
-      if (!this.modal) return;
-      const modalBody = shadowRoot.querySelector("#modal-body");
-      if (!modalBody) return;
-      modalBody.innerHTML = `
+        // Next step is to verify email or phone number before the user can login
+        this.state.step = "verify";
+
+        if (!this.modal) return;
+        const modalBody = shadowRoot.querySelector("#modal-body");
+        if (!modalBody) return;
+        modalBody.innerHTML = `
         <div>
           <img width="40%" src="${this.state.logoUri}" alt="Go Passwordless Logo" />
           <p>Enter your verification code to continue</p>
@@ -198,32 +226,47 @@ export class GoPasswordlessModal {
           <p>Didn't get a code? <span id="resend">Resend code</a></p>
         </div>`;
 
-      // Apply styles to input and button
-      const submitButton = shadowRoot.querySelector("#submit") as HTMLElement;
-      if (submitButton) {
-        this.applyStyles(submitButton, this.buttonStyle);
+        // Apply styles to input and button
+        const submitButton = shadowRoot.querySelector("#submit") as HTMLElement;
+        if (submitButton) {
+          this.applyStyles(submitButton, this.buttonStyle);
 
-        submitButton.addEventListener(
-          "click",
-          this.handleVerificationSubmit.bind(this)
-        );
-      }
+          submitButton.addEventListener(
+            "click",
+            this.handleVerificationSubmit.bind(this)
+          );
+        }
 
-      const otpDigitInputs = shadowRoot.querySelectorAll("input");
-      otpDigitInputs.forEach((input, index) => {
-        this.applyStyles(input, { ...this.inputStyle, width: "30px" });
-        input.addEventListener("input", (e) => {
-          const target = e.target as HTMLInputElement;
-          const nextSibling = target.nextElementSibling as HTMLInputElement;
-          if (target.value.length === 1 && nextSibling) {
-            nextSibling.focus();
-          }
+        const otpDigitInputs = shadowRoot.querySelectorAll("input");
+        otpDigitInputs.forEach((input, index) => {
+          this.applyStyles(input, { ...this.inputStyle, width: "30px" });
+          input.addEventListener("input", (e) => {
+            const target = e.target as HTMLInputElement;
+            const nextSibling = target.nextElementSibling as HTMLInputElement;
+            if (target.value.length === 1 && nextSibling) {
+              nextSibling.focus();
+            }
+          });
         });
-      });
 
-      const resend = shadowRoot.querySelector("#resend") as HTMLElement;
-      if (resend) {
-        this.applyStyles(resend, this.linkStyle);
+        const resend = shadowRoot.querySelector("#resend") as HTMLElement;
+        if (resend) {
+          this.applyStyles(resend, this.linkStyle);
+        }
+      } catch (err) {
+        this.state.isError = true;
+        this.state.error = err as Error;
+
+        // Display error message
+        this.displayError();
+
+        // Enable all buttons
+        buttons.forEach((button) => {
+          this.applyStyles(
+            button,
+            modalButtonStyle({ theme: this.state.theme })
+          );
+        });
       }
     }
   }
@@ -253,25 +296,38 @@ export class GoPasswordlessModal {
       .map((input) => input.value)
       .join("");
 
-    // Submit verification code
-    const { accessToken } = await completeRegistration(
-      this.state.appId,
-      username,
-      code,
-      this.state.signupToken || "",
-      this.state.uri
-    );
+    try {
+      // Submit verification code
+      const { accessToken } = await completeRegistration(
+        this.state.appId,
+        username,
+        code,
+        this.state.signupToken || "",
+        this.state.uri
+      );
 
-    this.state.step = "complete";
+      this.state.step = "complete";
 
-    if (this.onSignupSuccess) {
-      this.onSignupSuccess({ accessToken });
+      if (this.onSignupSuccess) {
+        this.onSignupSuccess({ accessToken });
+      }
+
+      this.state.accessToken = accessToken;
+
+      // close the modal
+      this.applyStyles(this.modal, closedModalStyle);
+    } catch (err) {
+      this.state.isError = true;
+      this.state.error = err as Error;
+
+      // Display error message
+      this.displayError();
+
+      // Enable all buttons
+      buttons.forEach((button) => {
+        this.applyStyles(button, modalButtonStyle({ theme: this.state.theme }));
+      });
     }
-
-    this.state.accessToken = accessToken;
-
-    // close the modal
-    this.applyStyles(this.modal, closedModalStyle);
   }
 
   private async handleLoginSubmit() {
@@ -298,22 +354,38 @@ export class GoPasswordlessModal {
       this.state.username = username;
 
       // WebAuthn login
-      const { accessToken } = await login(
-        this.state.appId,
-        username,
-        this.state.uri
-      );
+      try {
+        const { accessToken } = await login(
+          this.state.appId,
+          username,
+          this.state.uri
+        );
 
-      this.state.step = "complete";
+        this.state.step = "complete";
 
-      if (this.onLoginSuccess) {
-        this.onLoginSuccess({ accessToken });
+        if (this.onLoginSuccess) {
+          this.onLoginSuccess({ accessToken });
+        }
+
+        this.state.accessToken = accessToken;
+
+        // close the modal
+        this.applyStyles(this.modal, closedModalStyle);
+      } catch (err) {
+        this.state.isError = true;
+        this.state.error = err as Error;
+
+        // Display error message
+        this.displayError();
+
+        // Enable all buttons
+        buttons.forEach((button) => {
+          this.applyStyles(
+            button,
+            modalButtonStyle({ theme: this.state.theme })
+          );
+        });
       }
-
-      this.state.accessToken = accessToken;
-
-      // close the modal
-      this.applyStyles(this.modal, closedModalStyle);
     }
   }
 
