@@ -84,6 +84,8 @@ export const modalButtonStyle = ({ theme }: ModalButtonStyleProps) => ({
   cursor: "pointer",
   margin: "10px 0",
   boxShadow: "0 2px 4px 0 rgba(0,0,0,0.2)", // Subtle shadow
+  opacity: "1",
+  pointerEvents: "auto",
 });
 
 export interface ModalButtonStyleLoadingProps {
