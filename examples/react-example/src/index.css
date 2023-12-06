@@ -6,6 +6,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1e2132;
+  height: 100vh;
+}
+
+#root {
+  height: 100vh;
 }
 
 code {

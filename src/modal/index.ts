@@ -7,10 +7,12 @@ import {
   Theme,
   closedModalStyle,
   modalButtonStyle,
+  modalButtonStyleLoading,
   modalContentStyle,
   modalInputStyle,
   modalLinkStyle,
   modalStyle,
+  openModalContentStyle,
   openModalStyle,
 } from "./styles";
 
@@ -21,6 +23,7 @@ interface GoPasswordlessModalState {
   appId: string;
   appName: string;
   uri: string;
+  isLoading: boolean;
   username?: string;
   signupToken?: string;
   accessToken?: string;
@@ -43,6 +46,7 @@ export class GoPasswordlessModal {
     uri: "",
     theme: "light",
     logoUri: "",
+    isLoading: false,
   };
   private contentStyle = modalContentStyle({ theme: "light" });
   private inputStyle = modalInputStyle({ theme: "light" });
@@ -50,6 +54,9 @@ export class GoPasswordlessModal {
   private linkStyle = modalLinkStyle({ theme: "light" });
 
   private modal: HTMLElement | null = null;
+  private modalContent: HTMLElement | null = null;
+  private shadowRoot: ShadowRoot | null = null;
+
   private onSignupSuccess?: ({ accessToken }: { accessToken: string }) => void;
   private onLoginSuccess?: ({ accessToken }: { accessToken: string }) => void;
 
@@ -88,26 +95,50 @@ export class GoPasswordlessModal {
 
     this.modal = document.createElement("div");
     this.modal.id = "go-passwordless-modal";
-    this.applyStyles(this.modal, modalStyle);
 
-    // Close modal when clicking outside of it
+    // Regsiter listener to close modal on all clicks outside the modal
     this.modal.addEventListener("click", (e) => {
-      if (e.target === this.modal) {
-        // clear from DOM
-        this.modal?.remove();
-        this.modal = null;
+      const target = e.target as HTMLElement;
+      if (target.id === "go-passwordless-modal") {
+        this.close();
       }
     });
+
+    this.shadowRoot = this.modal.attachShadow({ mode: "open" });
+
+    // attach styles
+    const styleEl = document.createElement("style");
+    styleEl.textContent = `
+      @keyframes modalFadeInScaleUp {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    `;
+    this.shadowRoot.appendChild(styleEl);
+
+    // Clicks on the modal should not close the modal
+    this.shadowRoot.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+
+    this.applyStyles(this.modal, modalStyle);
 
     const modalContent = document.createElement("div");
     modalContent.className = "modal-content";
     this.applyStyles(modalContent, this.contentStyle);
+    this.modalContent = modalContent;
 
     const modalBody = document.createElement("div");
     modalBody.id = "modal-body";
 
     modalContent.appendChild(modalBody);
-    this.modal.appendChild(modalContent);
+    this.shadowRoot.appendChild(modalContent);
     document.body.appendChild(this.modal);
   }
 
@@ -119,7 +150,21 @@ export class GoPasswordlessModal {
 
   private async handleRegistrationSubmit() {
     if (!this.modal) return;
-    const usernameInput = this.modal.querySelector(
+
+    // Access shadow root
+    const shadowRoot = this.shadowRoot;
+    if (!shadowRoot) return;
+
+    // set the button loading style on all buttons
+    const buttons = shadowRoot.querySelectorAll("button");
+    buttons.forEach((button) => {
+      this.applyStyles(
+        button,
+        modalButtonStyleLoading({ theme: this.state.theme })
+      );
+    });
+
+    const usernameInput = shadowRoot.querySelector(
       "#username"
     ) as HTMLInputElement;
     if (usernameInput) {
@@ -137,7 +182,7 @@ export class GoPasswordlessModal {
       this.state.step = "verify";
 
       if (!this.modal) return;
-      const modalBody = this.modal?.querySelector("#modal-body");
+      const modalBody = shadowRoot.querySelector("#modal-body");
       if (!modalBody) return;
       modalBody.innerHTML = `
         <div>
@@ -154,16 +199,17 @@ export class GoPasswordlessModal {
         </div>`;
 
       // Apply styles to input and button
-      const submitButton = this.modal.querySelector("#submit") as HTMLElement;
+      const submitButton = shadowRoot.querySelector("#submit") as HTMLElement;
       if (submitButton) {
         this.applyStyles(submitButton, this.buttonStyle);
+
         submitButton.addEventListener(
           "click",
           this.handleVerificationSubmit.bind(this)
         );
       }
 
-      const otpDigitInputs = this.modal.querySelectorAll("input");
+      const otpDigitInputs = shadowRoot.querySelectorAll("input");
       otpDigitInputs.forEach((input, index) => {
         this.applyStyles(input, { ...this.inputStyle, width: "30px" });
         input.addEventListener("input", (e) => {
@@ -175,7 +221,7 @@ export class GoPasswordlessModal {
         });
       });
 
-      const resend = this.modal.querySelector("#resend") as HTMLElement;
+      const resend = shadowRoot.querySelector("#resend") as HTMLElement;
       if (resend) {
         this.applyStyles(resend, this.linkStyle);
       }
@@ -185,12 +231,25 @@ export class GoPasswordlessModal {
   private async handleVerificationSubmit() {
     if (!this.modal) return;
 
+    // Access shadow root
+    const shadowRoot = this.shadowRoot;
+    if (!shadowRoot) return;
+
+    // Add loading style to all buttons
+    const buttons = shadowRoot.querySelectorAll("button");
+    buttons.forEach((button) => {
+      this.applyStyles(
+        button,
+        modalButtonStyleLoading({ theme: this.state.theme })
+      );
+    });
+
     const username = this.state.username;
 
     if (!username) return;
 
     // Get the code by reading each input value and concatenating
-    const code = Array.from(this.modal.querySelectorAll("input"))
+    const code = Array.from(shadowRoot.querySelectorAll("input"))
       .map((input) => input.value)
       .join("");
 
@@ -217,7 +276,21 @@ export class GoPasswordlessModal {
 
   private async handleLoginSubmit() {
     if (!this.modal) return;
-    const usernameInput = this.modal.querySelector(
+
+    // Access shadow root
+    const shadowRoot = this.shadowRoot;
+    if (!shadowRoot) return;
+
+    // Add loading style to all buttons
+    const buttons = shadowRoot.querySelectorAll("button");
+    buttons.forEach((button) => {
+      this.applyStyles(
+        button,
+        modalButtonStyleLoading({ theme: this.state.theme })
+      );
+    });
+
+    const usernameInput = shadowRoot.querySelector(
       "#username"
     ) as HTMLInputElement;
     if (usernameInput) {
@@ -247,8 +320,23 @@ export class GoPasswordlessModal {
   startRegistration() {
     this.createModal();
     if (!this.modal) return;
-    const modalBody = this.modal?.querySelector("#modal-body");
+    if (!this.modalContent) return;
+
+    // Access shadow root
+    const shadowRoot = this.shadowRoot;
+    if (!shadowRoot) return;
+
+    // Apply the visible style to the modal
+    this.applyStyles(this.modal, openModalStyle);
+
+    // Apply the visible style to the modal content
+    this.applyStyles(this.modalContent, openModalContentStyle);
+
+    const modalBody = shadowRoot.querySelector("#modal-body");
     if (!modalBody) return;
+
+    this.state.isLoading = false;
+
     modalBody.innerHTML = `
       <div>
         <img width="40%" src="${this.state.logoUri}" alt="Go Passwordless Logo" />
@@ -257,17 +345,17 @@ export class GoPasswordlessModal {
         <button id="submit">Continue</button>
         <p>Already have an account? <span id="signup">Login</a></p>
       </div>`;
-    this.applyStyles(this.modal, openModalStyle);
 
     // Apply styles to input and button
-    const usernameInput = this.modal.querySelector("#username") as HTMLElement;
-    const submitButton = this.modal.querySelector("#submit") as HTMLElement;
-    const signup = this.modal.querySelector("#signup") as HTMLElement;
+    const usernameInput = shadowRoot.querySelector("#username") as HTMLElement;
+    const submitButton = shadowRoot.querySelector("#submit") as HTMLElement;
+    const signup = shadowRoot.querySelector("#signup") as HTMLElement;
     if (usernameInput) {
       this.applyStyles(usernameInput, this.inputStyle);
     }
     if (submitButton) {
       this.applyStyles(submitButton, this.buttonStyle);
+
       submitButton.addEventListener(
         "click",
         this.handleRegistrationSubmit.bind(this)
@@ -285,8 +373,21 @@ export class GoPasswordlessModal {
   startLogin() {
     this.createModal();
     if (!this.modal) return;
-    const modalBody = this.modal?.querySelector("#modal-body");
+    if (!this.modalContent) return;
+
+    // Access shadow root
+    const shadowRoot = this.shadowRoot;
+    if (!shadowRoot) return;
+
+    // Apply the visible style to the modal
+    this.applyStyles(this.modal, openModalStyle);
+
+    // Apply the visible style to the modal content
+    this.applyStyles(this.modalContent, openModalContentStyle);
+
+    const modalBody = shadowRoot.querySelector("#modal-body");
     if (!modalBody) return;
+
     modalBody.innerHTML = `
       <div>
         <img width="40%" src="${this.state.logoUri}" alt="Go Passwordless Logo" />
@@ -295,12 +396,12 @@ export class GoPasswordlessModal {
         <button id="submit">Continue</button>
         <p>Don't have an account? <span id="signup">Sign up</a></p>
       </div>`;
-    this.applyStyles(this.modal, openModalStyle);
 
     // Apply styles to input and button
-    const usernameInput = this.modal.querySelector("#username") as HTMLElement;
-    const submitButton = this.modal.querySelector("#submit") as HTMLElement;
-    const signup = this.modal.querySelector("#signup") as HTMLElement;
+    const usernameInput = shadowRoot.querySelector("#username") as HTMLElement;
+
+    const submitButton = shadowRoot.querySelector("#submit") as HTMLElement;
+    const signup = shadowRoot.querySelector("#signup") as HTMLElement;
     if (usernameInput) {
       this.applyStyles(usernameInput, this.inputStyle);
     }
@@ -315,5 +416,10 @@ export class GoPasswordlessModal {
         this.startRegistration();
       });
     }
+  }
+
+  close() {
+    if (!this.modal) return;
+    this.modal.remove();
   }
 }
