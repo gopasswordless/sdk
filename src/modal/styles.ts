@@ -119,3 +119,12 @@ export const modalLinkStyle = ({ theme }: ModalLinkStyleProps) => ({
   textDecoration: "none",
   cursor: "pointer",
 });
+
+export interface ModalErrorStyleProps {
+  theme: Theme;
+}
+
+export const modalErrorStyle = ({ theme }: ModalErrorStyleProps) => ({
+  color: "red",
+  fontWeight: "bold",
+});
