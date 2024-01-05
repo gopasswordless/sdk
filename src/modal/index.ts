@@ -9,6 +9,7 @@ import {
   modalButtonStyle,
   modalButtonStyleLoading,
   modalContentStyle,
+  modalErrorStyle,
   modalInputStyle,
   modalLinkStyle,
   modalStyle,
@@ -56,6 +57,7 @@ export class GoPasswordlessModal {
   private inputStyle = modalInputStyle({ theme: "light" });
   private buttonStyle = modalButtonStyle({ theme: "light" });
   private linkStyle = modalLinkStyle({ theme: "light" });
+  private errorStyle = modalErrorStyle({ theme: "light" });
 
   private modal: HTMLElement | null = null;
   private modalContent: HTMLElement | null = null;
@@ -100,14 +102,6 @@ export class GoPasswordlessModal {
     this.modal = document.createElement("div");
     this.modal.id = "go-passwordless-modal";
 
-    // Regsiter listener to close modal on all clicks outside the modal
-    this.modal.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      if (target.id === "go-passwordless-modal") {
-        this.close();
-      }
-    });
-
     this.shadowRoot = this.modal.attachShadow({ mode: "open" });
 
     // attach styles
@@ -125,11 +119,6 @@ export class GoPasswordlessModal {
       }
     `;
     this.shadowRoot.appendChild(styleEl);
-
-    // Clicks on the modal should not close the modal
-    this.shadowRoot.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
 
     this.applyStyles(this.modal, modalStyle);
 
@@ -164,6 +153,7 @@ export class GoPasswordlessModal {
       const errorEl = document.createElement("p");
       errorEl.id = "error";
       errorEl.textContent = this.state.error?.message || "";
+      this.applyStyles(errorEl, this.errorStyle);
       modalBody.appendChild(errorEl);
     } else {
       const errorEl = shadowRoot.querySelector("#error");
@@ -203,8 +193,6 @@ export class GoPasswordlessModal {
           username,
           this.state.uri
         );
-
-        console.log("signup token", this.state.signupToken);
 
         // Next step is to verify email or phone number before the user can login
         this.state.step = "verify";
