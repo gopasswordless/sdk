@@ -127,4 +127,5 @@ export interface ModalErrorStyleProps {
 export const modalErrorStyle = ({ theme }: ModalErrorStyleProps) => ({
   color: "red",
   fontWeight: "bold",
+  fontSize: "14px",
 });
