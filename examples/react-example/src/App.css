@@ -5,11 +5,16 @@
   height: 100vh;
 }
 
+@media screen and (max-width: 600px) {
+  .App {
+    grid-template-columns: 1fr;
+  }
+}
+
 .Container {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 5rem;
 }
 
 .App select {

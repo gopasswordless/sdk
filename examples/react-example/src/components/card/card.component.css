@@ -4,4 +4,17 @@
   margin: 10px;
   border-radius: 10px;
   background-color: #ffffff;
+  max-width: 100vw;
+}
+
+pre {
+  white-space: pre-wrap; /* Since CSS 2.1 */
+  word-wrap: break-word; /* Internet Explorer 5.5+ */
+  overflow-wrap: break-word; /* Modern browsers */
+}
+
+@media screen and (max-width: 600px) {
+  pre {
+    font-size: 10px;
+  }
 }
