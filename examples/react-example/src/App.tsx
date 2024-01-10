@@ -16,6 +16,7 @@ export const App = (): JSX.Element => {
             Play around with our configurations to see how you can modify the
             GoPasswordless SDK.
           </p>
+          <h4>Screen</h4>
           <select
             value={screen}
             onChange={(e) => setScreen(e.target.value as GoPasswordlessScreen)}
@@ -24,10 +25,23 @@ export const App = (): JSX.Element => {
             <option value="login">Login</option>
             <option value="verify">Verify</option>
           </select>
+          <h4>Implementation Code</h4>
+          <pre>
+            <code>
+              {`<GoPasswordlessComponent
+  appId="YOUR_APP_ID"
+  onSignupStarted={(signupToken) => handleSignupStarted()}
+  onSignupCompleted={(accessToken) => handleSignupCompleted()}
+  onLoginSuccess={(accessToken) => handleLoginSuccess()}
+  screen={'${screen}'}
+/>`}
+            </code>
+          </pre>
         </CardComponent>
       </div>
       <div className="Container">
         <GoPasswordlessComponent
+          appId="123"
           appName="GoPasswordless Demo"
           appLogo="https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo_vertical_dark.png"
           screen={screen}

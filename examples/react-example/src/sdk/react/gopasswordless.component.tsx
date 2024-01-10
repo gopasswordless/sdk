@@ -30,6 +30,7 @@ export const GoPasswordlessBaseComponent = ({
 
 export interface GoPasswordlessComponentProps {
   // TODO: Load this data from the backend and only take appId as a prop
+  appId: string;
   appName: string;
   appLogo: string;
   screen: GoPasswordlessScreen;
@@ -48,6 +49,10 @@ export const GoPasswordlessComponent = ({
     setCurrentScreen(screen);
   }, [screen]);
 
+  const switchScreen = ({ screen }: { screen: GoPasswordlessScreen }) => {
+    setCurrentScreen(screen);
+  };
+
   switch (currentScreen) {
     case "signup":
       return (
@@ -59,7 +64,13 @@ export const GoPasswordlessComponent = ({
           </button>
           <div className="GoPasswordlessDivider" />
           <p>
-            Already have an account? <span>Login</span>
+            Already have an account?{" "}
+            <span
+              className="GoPasswordlessLink"
+              onClick={() => switchScreen({ screen: "login" })}
+            >
+              Login
+            </span>
           </p>
         </GoPasswordlessBaseComponent>
       );
@@ -73,7 +84,8 @@ export const GoPasswordlessComponent = ({
           </button>
           <div className="GoPasswordlessDivider" />
           <p>
-            Didn't receive a code? <span>Resend</span>
+            Didn't receive a code?{" "}
+            <span className="GoPasswordlessLink">Resend</span>
           </p>
         </GoPasswordlessBaseComponent>
       );
@@ -87,7 +99,13 @@ export const GoPasswordlessComponent = ({
           </button>
           <div className="GoPasswordlessDivider" />
           <p>
-            Don't have an account? <span>Signup</span>
+            Don't have an account?{" "}
+            <span
+              className="GoPasswordlessLink"
+              onClick={() => switchScreen({ screen: "signup" })}
+            >
+              Signup
+            </span>
           </p>
         </GoPasswordlessBaseComponent>
       );

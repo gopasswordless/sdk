@@ -1,7 +1,8 @@
 .App {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 5rem;
+  place-items: center;
+  height: 100vh;
 }
 
 .Container {
@@ -9,4 +10,13 @@
   justify-content: center;
   align-items: center;
   padding: 5rem;
+}
+
+.App select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  color: #333;
+  font-size: 1rem;
 }
