@@ -8,7 +8,13 @@ import {
 import "./verification-code-input.component.css";
 import { GoPasswordlessInputComponent } from "../input/input.component";
 
-export const VerificationCodeInput = (): JSX.Element => {
+export interface VerificationCodeInputProps {
+  onChange: (verificationCode: string) => void;
+}
+
+export const VerificationCodeInput = ({
+  onChange,
+}: VerificationCodeInputProps): JSX.Element => {
   const [code, setCode] = useState<string[]>(Array(6).fill("")); // Initialize an array of 6 empty strings
   const inputRefs = Array.from({ length: 6 }, () =>
     createRef<HTMLInputElement>()
@@ -36,6 +42,7 @@ export const VerificationCodeInput = (): JSX.Element => {
       ...prevCode.slice(index + 1),
     ]);
     focusNext(index, value);
+    onChange(code.join(""));
   };
 
   useEffect(() => {

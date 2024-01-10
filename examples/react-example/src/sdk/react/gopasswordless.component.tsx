@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import "./gopasswordless.component.css";
 import { VerificationCodeInput } from "./components/verification-code-input/verification-code-input.component";
 import { GoPasswordlessInputComponent } from "./components/input/input.component";
+import { beginRegistration, completeRegistration, login } from "../browser";
 
 export type GoPasswordlessScreen = "signup" | "login" | "verify";
 
@@ -45,6 +46,9 @@ export const GoPasswordlessComponent = ({
     "signup" | "login" | "verify"
   >(screen);
 
+  const [username, setUsername] = useState<string>("");
+  const [verificationCode, setVerificationCode] = useState<string>("");
+
   useEffect(() => {
     setCurrentScreen(screen);
   }, [screen]);
@@ -53,13 +57,51 @@ export const GoPasswordlessComponent = ({
     setCurrentScreen(screen);
   };
 
+  const handleSubmit = async () => {
+    switch (screen) {
+      case "signup":
+        const signupToken = await beginRegistration(
+          "c812b3f8-d945-41d8-bc87-bc9498022bf2",
+          username
+        );
+        localStorage.setItem("gopasswordlessSignupToken", signupToken);
+        setCurrentScreen("verify");
+        break;
+      case "verify":
+        const resp = await completeRegistration(
+          "c812b3f8-d945-41d8-bc87-bc9498022bf2",
+          username,
+          verificationCode,
+          localStorage.getItem("gopasswordlessSignupToken")!
+        );
+        localStorage.setItem("gopasswordlessAccessToken", resp.accessToken);
+        break;
+      case "login":
+        const loginResp = await login(
+          "c812b3f8-d945-41d8-bc87-bc9498022bf2",
+          username
+        );
+        localStorage.setItem("loginResp", loginResp.accessToken);
+        break;
+      default:
+        break;
+    }
+  };
+
   switch (currentScreen) {
     case "signup":
       return (
         <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
           <h3>Signup to {appName}</h3>
-          <GoPasswordlessInputComponent placeholder="Enter email or phone number " />
-          <button className="GoPasswordlessButton" type="button">
+          <GoPasswordlessInputComponent
+            placeholder="Enter email or phone number"
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <button
+            className="GoPasswordlessButton"
+            type="button"
+            onClick={handleSubmit}
+          >
             Continue
           </button>
           <div className="GoPasswordlessDivider" />
@@ -78,8 +120,14 @@ export const GoPasswordlessComponent = ({
       return (
         <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
           <h3>Verify your {appName} account</h3>
-          <VerificationCodeInput />
-          <button className="GoPasswordlessButton" type="button">
+          <VerificationCodeInput
+            onChange={(code) => setVerificationCode(code)}
+          />
+          <button
+            className="GoPasswordlessButton"
+            type="button"
+            onClick={handleSubmit}
+          >
             Verify
           </button>
           <div className="GoPasswordlessDivider" />
@@ -93,8 +141,15 @@ export const GoPasswordlessComponent = ({
       return (
         <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
           <h3>Log in to {appName}</h3>
-          <GoPasswordlessInputComponent placeholder="Enter email or phone number" />
-          <button className="GoPasswordlessButton" type="button">
+          <GoPasswordlessInputComponent
+            placeholder="Enter email or phone number"
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <button
+            className="GoPasswordlessButton"
+            type="button"
+            onClick={handleSubmit}
+          >
             Continue
           </button>
           <div className="GoPasswordlessDivider" />
