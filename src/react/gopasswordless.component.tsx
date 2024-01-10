@@ -1,8 +1,9 @@
-import { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import "./gopasswordless.component.css";
 import { VerificationCodeInput } from "./components/verification-code-input/verification-code-input.component";
 import { GoPasswordlessInputComponent } from "./components/input/input.component";
 import { beginRegistration, completeRegistration, login } from "../browser";
+import { GoPasswordlessButtonComponent } from "./components/button/button.component";
 
 export type GoPasswordlessScreen = "signup" | "login" | "verify";
 
@@ -35,19 +36,26 @@ export interface GoPasswordlessComponentProps {
   appName: string;
   appLogo: string;
   screen: GoPasswordlessScreen;
+  onSignupStarted?: ({ signupToken }: { signupToken: string }) => void;
+  onSignupCompleted?: ({ accessToken }: { accessToken: string }) => void;
+  onLoginSuccess?: ({ accessToken }: { accessToken: string }) => void;
 }
 
 export const GoPasswordlessComponent = ({
+  appId,
   appName,
   appLogo,
   screen,
+  onSignupStarted,
+  onSignupCompleted,
+  onLoginSuccess,
 }: GoPasswordlessComponentProps): JSX.Element => {
   const [currentScreen, setCurrentScreen] = useState<
     "signup" | "login" | "verify"
   >(screen);
-
   const [username, setUsername] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setCurrentScreen(screen);
@@ -58,52 +66,61 @@ export const GoPasswordlessComponent = ({
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
+
     switch (screen) {
       case "signup":
-        const signupToken = await beginRegistration(
-          "c812b3f8-d945-41d8-bc87-bc9498022bf2",
-          username
-        );
+        const signupToken = await beginRegistration(appId, username);
+        // Store the signup token and username in localStorage incase the user closes the tab
+        // before completing the verification
         localStorage.setItem("gopasswordlessSignupToken", signupToken);
+        localStorage.setItem("gopasswordlessUsername", username);
         setCurrentScreen("verify");
+        onSignupStarted?.({ signupToken });
         break;
       case "verify":
         const resp = await completeRegistration(
-          "c812b3f8-d945-41d8-bc87-bc9498022bf2",
-          username,
+          appId,
+          username !== ""
+            ? username
+            : localStorage.getItem("gopasswordlessUsername")!,
           verificationCode,
           localStorage.getItem("gopasswordlessSignupToken")!
         );
         localStorage.setItem("gopasswordlessAccessToken", resp.accessToken);
+        onSignupCompleted?.({ accessToken: resp.accessToken });
         break;
       case "login":
-        const loginResp = await login(
-          "c812b3f8-d945-41d8-bc87-bc9498022bf2",
-          username
+        const loginResp = await login(appId, username);
+        localStorage.setItem(
+          "gopasswordlessAccessToken",
+          loginResp.accessToken
         );
-        localStorage.setItem("loginResp", loginResp.accessToken);
+        onLoginSuccess?.({ accessToken: loginResp.accessToken });
         break;
       default:
         break;
     }
+
+    setLoading(false);
   };
 
   switch (currentScreen) {
     case "signup":
       return (
         <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
-          <h3>Signup to {appName}</h3>
+          <h3 style={{ fontWeight: "normal" }}>Signup to {appName}</h3>
           <GoPasswordlessInputComponent
             placeholder="Enter email or phone number"
             onChange={(e) => setUsername(e.target.value)}
           />
-          <button
-            className="GoPasswordlessButton"
-            type="button"
+          <GoPasswordlessButtonComponent
             onClick={handleSubmit}
+            type="button"
+            loading={loading}
           >
             Continue
-          </button>
+          </GoPasswordlessButtonComponent>
           <div className="GoPasswordlessDivider" />
           <p>
             Already have an account?{" "}
@@ -119,17 +136,19 @@ export const GoPasswordlessComponent = ({
     case "verify":
       return (
         <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
-          <h3>Verify your {appName} account</h3>
+          <h3 style={{ fontWeight: "normal" }}>
+            Verify your {appName} account
+          </h3>
           <VerificationCodeInput
             onChange={(code) => setVerificationCode(code)}
           />
-          <button
-            className="GoPasswordlessButton"
-            type="button"
+          <GoPasswordlessButtonComponent
             onClick={handleSubmit}
+            type="button"
+            loading={loading}
           >
             Verify
-          </button>
+          </GoPasswordlessButtonComponent>
           <div className="GoPasswordlessDivider" />
           <p>
             Didn't receive a code?{" "}
@@ -140,18 +159,18 @@ export const GoPasswordlessComponent = ({
     case "login":
       return (
         <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
-          <h3>Log in to {appName}</h3>
+          <h3 style={{ fontWeight: "normal" }}>Log in to {appName}</h3>
           <GoPasswordlessInputComponent
             placeholder="Enter email or phone number"
             onChange={(e) => setUsername(e.target.value)}
           />
-          <button
-            className="GoPasswordlessButton"
-            type="button"
+          <GoPasswordlessButtonComponent
             onClick={handleSubmit}
+            type="button"
+            loading={loading}
           >
             Continue
-          </button>
+          </GoPasswordlessButtonComponent>
           <div className="GoPasswordlessDivider" />
           <p>
             Don't have an account?{" "}

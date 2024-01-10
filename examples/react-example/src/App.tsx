@@ -2,7 +2,10 @@
 import { useState } from "react";
 import "./App.css";
 import { CardComponent } from "./components/card/card.component";
-import { GoPasswordlessComponent, GoPasswordlessScreen } from "./sdk";
+import {
+  GoPasswordlessComponent,
+  GoPasswordlessScreen,
+} from "@gopasswordless/sdk";
 
 export const App = (): JSX.Element => {
   const [screen, setScreen] = useState<GoPasswordlessScreen>("signup");
@@ -41,7 +44,7 @@ export const App = (): JSX.Element => {
       </div>
       <div className="Container">
         <GoPasswordlessComponent
-          appId="123"
+          appId={process.env.REACT_APP_GOPASSWORDLESS_APP_ID || ""}
           appName="GoPasswordless Demo"
           appLogo="https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo_vertical_dark.png"
           screen={screen}
