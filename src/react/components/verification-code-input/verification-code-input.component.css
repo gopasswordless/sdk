@@ -2,3 +2,9 @@
   display: flex;
   gap: 5px;
 }
+
+.GoPasswordlessErrorMessage {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}

@@ -10,10 +10,12 @@ import { GoPasswordlessInputComponent } from "../input/input.component";
 
 export interface VerificationCodeInputProps {
   onChange: (verificationCode: string) => void;
+  error?: string;
 }
 
 export const VerificationCodeInput = ({
   onChange,
+  error,
 }: VerificationCodeInputProps): JSX.Element => {
   const [code, setCode] = useState<string[]>(Array(6).fill("")); // Initialize an array of 6 empty strings
   const inputRefs = Array.from({ length: 6 }, () =>
@@ -50,17 +52,25 @@ export const VerificationCodeInput = ({
   }, []);
 
   return (
-    <div onPaste={handlePaste} className="GoPasswordlessVerificationCodeInput">
-      {code.map((digit, index) => (
-        <GoPasswordlessInputComponent
-          key={index}
-          ref={inputRefs[index]}
-          type="text"
-          maxLength={1}
-          value={digit}
-          onChange={(e: any) => handleChange(index, e)}
-        />
-      ))}
+    <div>
+      <div
+        onPaste={handlePaste}
+        className="GoPasswordlessVerificationCodeInput"
+      >
+        {code.map((digit, index) => (
+          <GoPasswordlessInputComponent
+            key={index}
+            ref={inputRefs[index]}
+            type="text"
+            maxLength={1}
+            value={digit}
+            onChange={(e: any) => handleChange(index, e)}
+            error={error}
+            displayErrorMessage={false}
+          />
+        ))}
+      </div>
+      {error && <p className="GoPasswordlessErrorMessage">{error}</p>}
     </div>
   );
 };
