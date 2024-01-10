@@ -27,6 +27,7 @@ export const App = (): JSX.Element => {
             <option value="signup">Signup</option>
             <option value="login">Login</option>
             <option value="verify">Verify</option>
+            <option value="profile">Profile</option>
           </select>
           <h4>Implementation Code</h4>
           <pre>

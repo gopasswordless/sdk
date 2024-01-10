@@ -22,6 +22,10 @@ export const VerificationCodeInput = ({
     createRef<HTMLInputElement>()
   ); // Create refs for each input
 
+  useEffect(() => {
+    onChange(code.join(""));
+  }, [code]);
+
   const focusNext = (index: number, value: string) => {
     if (value && index < 5) {
       inputRefs[index + 1].current?.focus();
@@ -44,7 +48,6 @@ export const VerificationCodeInput = ({
       ...prevCode.slice(index + 1),
     ]);
     focusNext(index, value);
-    onChange(code.join(""));
   };
 
   useEffect(() => {

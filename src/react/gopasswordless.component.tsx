@@ -5,7 +5,7 @@ import { GoPasswordlessInputComponent } from "./components/input/input.component
 import { beginRegistration, completeRegistration, login } from "../browser";
 import { GoPasswordlessButtonComponent } from "./components/button/button.component";
 
-export type GoPasswordlessScreen = "signup" | "login" | "verify";
+export type GoPasswordlessScreen = "signup" | "login" | "verify" | "profile";
 
 export interface GoPasswordlessBaseComponentProps {
   appName: string;
@@ -51,7 +51,7 @@ export const GoPasswordlessComponent = ({
   onLoginSuccess,
 }: GoPasswordlessComponentProps): JSX.Element => {
   const [currentScreen, setCurrentScreen] = useState<
-    "signup" | "login" | "verify"
+    "signup" | "login" | "verify" | "profile"
   >(screen);
   const [username, setUsername] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
@@ -70,7 +70,7 @@ export const GoPasswordlessComponent = ({
     setLoading(true);
     setError(undefined);
 
-    switch (screen) {
+    switch (currentScreen) {
       case "signup":
         try {
           const signupToken = await beginRegistration(appId, username);
@@ -100,6 +100,7 @@ export const GoPasswordlessComponent = ({
           );
           localStorage.setItem("gopasswordlessAccessToken", resp.accessToken);
           onSignupCompleted?.({ accessToken: resp.accessToken });
+          setCurrentScreen("profile");
         } catch (e) {
           if (e instanceof Error) {
             setError(e.message);
@@ -116,6 +117,7 @@ export const GoPasswordlessComponent = ({
             loginResp.accessToken
           );
           onLoginSuccess?.({ accessToken: loginResp.accessToken });
+          setCurrentScreen("profile");
         } catch (e) {
           if (e instanceof Error) {
             setError(e.message);
@@ -124,11 +126,18 @@ export const GoPasswordlessComponent = ({
           }
         }
         break;
+      case "profile":
+        break;
       default:
         break;
     }
 
     setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    localStorage.removeItem("gopasswordlessAccessToken");
+    switchScreen({ screen: "login" });
   };
 
   switch (currentScreen) {
@@ -210,6 +219,14 @@ export const GoPasswordlessComponent = ({
               Signup
             </span>
           </p>
+        </GoPasswordlessBaseComponent>
+      );
+    case "profile":
+      return (
+        <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
+          <span className="GoPasswordlessLink" onClick={handleLogout}>
+            Logout
+          </span>
         </GoPasswordlessBaseComponent>
       );
     default:
