@@ -7,4 +7,16 @@
   outline: none;
   transition: border-color 0.3s ease;
   width: 100%;
+  box-sizing: border-box;
+}
+
+.GoPasswordlessInputError {
+  border-color: red;
+  background-color: rgb(255, 216, 216);
+}
+
+.GoPasswordlessErrorMessage {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
 }

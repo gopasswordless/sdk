@@ -56,6 +56,7 @@ export const GoPasswordlessComponent = ({
   const [username, setUsername] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     setCurrentScreen(screen);
@@ -67,36 +68,61 @@ export const GoPasswordlessComponent = ({
 
   const handleSubmit = async () => {
     setLoading(true);
+    setError(undefined);
 
     switch (screen) {
       case "signup":
-        const signupToken = await beginRegistration(appId, username);
-        // Store the signup token and username in localStorage incase the user closes the tab
-        // before completing the verification
-        localStorage.setItem("gopasswordlessSignupToken", signupToken);
-        localStorage.setItem("gopasswordlessUsername", username);
-        setCurrentScreen("verify");
-        onSignupStarted?.({ signupToken });
+        try {
+          const signupToken = await beginRegistration(appId, username);
+          // Store the signup token and username in localStorage incase the user closes the tab
+          // before completing the verification
+          localStorage.setItem("gopasswordlessSignupToken", signupToken);
+          localStorage.setItem("gopasswordlessUsername", username);
+          setCurrentScreen("verify");
+          onSignupStarted?.({ signupToken });
+        } catch (e) {
+          if (e instanceof Error) {
+            setError(e.message);
+          } else {
+            setError("Oops! Something went wrong, please try again later.");
+          }
+        }
         break;
       case "verify":
-        const resp = await completeRegistration(
-          appId,
-          username !== ""
-            ? username
-            : localStorage.getItem("gopasswordlessUsername")!,
-          verificationCode,
-          localStorage.getItem("gopasswordlessSignupToken")!
-        );
-        localStorage.setItem("gopasswordlessAccessToken", resp.accessToken);
-        onSignupCompleted?.({ accessToken: resp.accessToken });
+        try {
+          const resp = await completeRegistration(
+            appId,
+            username !== ""
+              ? username
+              : localStorage.getItem("gopasswordlessUsername")!,
+            verificationCode,
+            localStorage.getItem("gopasswordlessSignupToken")!
+          );
+          localStorage.setItem("gopasswordlessAccessToken", resp.accessToken);
+          onSignupCompleted?.({ accessToken: resp.accessToken });
+        } catch (e) {
+          if (e instanceof Error) {
+            setError(e.message);
+          } else {
+            setError("Oops! Something went wrong, please try again later.");
+          }
+        }
         break;
       case "login":
-        const loginResp = await login(appId, username);
-        localStorage.setItem(
-          "gopasswordlessAccessToken",
-          loginResp.accessToken
-        );
-        onLoginSuccess?.({ accessToken: loginResp.accessToken });
+        try {
+          const loginResp = await login(appId, username);
+          localStorage.setItem(
+            "gopasswordlessAccessToken",
+            loginResp.accessToken
+          );
+          onLoginSuccess?.({ accessToken: loginResp.accessToken });
+        } catch (e) {
+          if (e instanceof Error) {
+            setError(e.message);
+          } else {
+            setError("Oops! Something went wrong, please try again later.");
+          }
+        }
         break;
       default:
         break;
@@ -113,6 +139,7 @@ export const GoPasswordlessComponent = ({
           <GoPasswordlessInputComponent
             placeholder="Enter email or phone number"
             onChange={(e) => setUsername(e.target.value)}
+            error={error}
           />
           <GoPasswordlessButtonComponent
             onClick={handleSubmit}
@@ -141,6 +168,7 @@ export const GoPasswordlessComponent = ({
           </h3>
           <VerificationCodeInput
             onChange={(code) => setVerificationCode(code)}
+            error={error}
           />
           <GoPasswordlessButtonComponent
             onClick={handleSubmit}
@@ -163,6 +191,7 @@ export const GoPasswordlessComponent = ({
           <GoPasswordlessInputComponent
             placeholder="Enter email or phone number"
             onChange={(e) => setUsername(e.target.value)}
+            error={error}
           />
           <GoPasswordlessButtonComponent
             onClick={handleSubmit}
