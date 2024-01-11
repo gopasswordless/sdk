@@ -2,7 +2,12 @@ import React, { ReactNode, useEffect, useState } from "react";
 import "./gopasswordless.component.css";
 import { VerificationCodeInput } from "./components/verification-code-input/verification-code-input.component";
 import { GoPasswordlessInputComponent } from "./components/input/input.component";
-import { beginRegistration, completeRegistration, login } from "../browser";
+import {
+  beginRegistration,
+  completeRegistration,
+  login,
+  resendVerificationCode,
+} from "../browser";
 import { GoPasswordlessButtonComponent } from "./components/button/button.component";
 
 export type GoPasswordlessScreen = "signup" | "login" | "verify" | "profile";
@@ -57,6 +62,8 @@ export const GoPasswordlessComponent = ({
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>(undefined);
+  const [verificationCodeResent, setVerificationCodeResent] =
+    useState<boolean>(false);
 
   useEffect(() => {
     setCurrentScreen(screen);
@@ -140,6 +147,19 @@ export const GoPasswordlessComponent = ({
     switchScreen({ screen: "login" });
   };
 
+  const handleResendVerificationCode = async () => {
+    try {
+      await resendVerificationCode(appId, username);
+      setVerificationCodeResent(true);
+    } catch (e) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError("Oops! Something went wrong, please try again later.");
+      }
+    }
+  };
+
   switch (currentScreen) {
     case "signup":
       return (
@@ -189,7 +209,18 @@ export const GoPasswordlessComponent = ({
           <div className="GoPasswordlessDivider" />
           <p>
             Didn't receive a code?{" "}
-            <span className="GoPasswordlessLink">Resend</span>
+            <span
+              className="GoPasswordlessLink"
+              onClick={handleResendVerificationCode}
+            >
+              Resend
+            </span>
+            {verificationCodeResent && (
+              <>
+                <br />
+                <span>Code resent successfully!</span>
+              </>
+            )}
           </p>
         </GoPasswordlessBaseComponent>
       );
