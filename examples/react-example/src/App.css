@@ -3,11 +3,13 @@
   grid-template-columns: 1fr 1fr;
   place-items: center;
   height: 100vh;
+  padding: 0 20rem;
 }
 
 @media screen and (max-width: 600px) {
   .App {
     grid-template-columns: 1fr;
+    padding: 0;
   }
 }
 

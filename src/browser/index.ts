@@ -144,3 +144,22 @@ export const login = async (
 
   return { accessToken: resp.accessToken };
 };
+
+export const resendVerificationCode = async (
+  appId: string,
+  username: string,
+  uri: string = "https://api.gopasswordless.dev/v1"
+): Promise<void> => {
+  const resp = await fetch(
+    `${uri}/auth/${appId}/registration/resend-verification-code`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username }),
+    }
+  ).then((res) => res.json());
+
+  if (resp.statusCode && resp.statusCode !== 200) {
+    throw new Error(resp.message);
+  }
+};
