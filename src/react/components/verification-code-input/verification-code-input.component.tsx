@@ -5,7 +5,6 @@ import React, {
   ClipboardEvent,
   ChangeEvent,
 } from "react";
-import "./verification-code-input.component.css";
 import { GoPasswordlessInputComponent } from "../input/input.component";
 
 export interface VerificationCodeInputProps {
