@@ -1,5 +1,4 @@
 import React, { InputHTMLAttributes, forwardRef } from "react";
-import "./input.component.css";
 
 export interface GoPasswordlessInputProps
   extends InputHTMLAttributes<HTMLInputElement> {

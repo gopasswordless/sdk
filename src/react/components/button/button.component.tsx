@@ -1,5 +1,4 @@
 import React, { ButtonHTMLAttributes } from "react";
-import "./button.component.css";
 
 export interface GoPasswordlessButtonComponentProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {

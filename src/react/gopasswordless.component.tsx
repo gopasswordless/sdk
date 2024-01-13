@@ -1,5 +1,4 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import "./gopasswordless.component.css";
 import { VerificationCodeInput } from "./components/verification-code-input/verification-code-input.component";
 import { GoPasswordlessInputComponent } from "./components/input/input.component";
 import {
@@ -9,6 +8,7 @@ import {
   resendVerificationCode,
 } from "../browser";
 import { GoPasswordlessButtonComponent } from "./components/button/button.component";
+import root from "react-shadow";
 
 export type GoPasswordlessScreen = "signup" | "login" | "verify" | "profile";
 
@@ -24,14 +24,140 @@ export const GoPasswordlessBaseComponent = ({
   children,
 }: GoPasswordlessBaseComponentProps): JSX.Element => {
   return (
-    <div className="GoPasswordlessWidget">
-      <img
-        className="GoPasswordlessLogo"
-        src={appLogo}
-        alt={`${appName} logo`}
-      />
-      {children}
-    </div>
+    <root.div>
+      <style>
+        {`
+          .GoPasswordlessLogo {
+            width: 50%;
+          }
+          
+          .GoPasswordlessWidget {
+            border: 1px solid #ddd;
+            padding: 15px 40px;
+            margin: 10px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 360px;
+            height: 500px;
+            gap: 20px;
+            text-align: center;
+            box-sizing: border-box;
+          }
+          
+          .GoPasswordlessDivider {
+            height: 1px;
+            border-top: 1px solid #ddd;
+            margin: 10px 0;
+            width: 100%;
+          }
+          
+          .GoPasswordlessLink {
+            color: #007bff;
+          }
+          
+          .GoPasswordlessLink:hover {
+            cursor: pointer;
+          }
+          
+          .GoPasswordlessInput {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          
+          .GoPasswordlessInputError {
+            border-color: red;
+            background-color: rgb(255, 216, 216);
+          }
+          
+          .GoPasswordlessErrorMessage {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+          }    
+
+          .GoPasswordlessVerificationCodeInput {
+            display: flex;
+            gap: 5px;
+          }
+           
+          .GoPasswordlessButton {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition: background-color 0.3s ease;
+          }
+          
+          .GoPasswordlessLoading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 18.5px;
+          }
+          
+          .GoPasswordlessLoadingDot {
+            width: 5px;
+            height: 5px;
+            border: 2px solid white;
+            border-radius: 50%;
+            float: left;
+            margin: 0 5px;
+            transform: scale(0);
+            animation: fx 1000ms ease infinite;
+          }
+          
+          .GoPasswordlessLoadingDot:nth-child(2) {
+            animation: fx 1000ms ease infinite;
+            animation-delay: 300ms;
+          }
+          
+          .GoPasswordlessLoadingDot:nth-child(3) {
+            animation: fx 1000ms ease infinite;
+            animation-delay: 600ms;
+          }
+          
+          @keyframes fx {
+            50% {
+              transform: scale(1);
+              opacity: 1;
+            }
+            100% {
+              opacity: 0;
+            }
+          }          
+        `}
+      </style>
+
+      <div className="GoPasswordlessWidget">
+        <img
+          className="GoPasswordlessLogo"
+          src={appLogo}
+          alt={`${appName} logo`}
+        />
+        {children}
+      </div>
+    </root.div>
   );
 };
 
