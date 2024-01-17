@@ -167,6 +167,7 @@ export interface GoPasswordlessComponentProps {
   appName: string;
   appLogo: string;
   screen: GoPasswordlessScreen;
+  apiUrl?: string;
   onSignupStarted?: ({ signupToken }: { signupToken: string }) => void;
   onSignupCompleted?: ({ accessToken }: { accessToken: string }) => void;
   onLoginSuccess?: ({ accessToken }: { accessToken: string }) => void;
@@ -177,6 +178,7 @@ export const GoPasswordlessComponent = ({
   appName,
   appLogo,
   screen,
+  apiUrl = "https://api.gopasswordless.dev/v1",
   onSignupStarted,
   onSignupCompleted,
   onLoginSuccess,
@@ -206,7 +208,7 @@ export const GoPasswordlessComponent = ({
     switch (currentScreen) {
       case "signup":
         try {
-          const signupToken = await beginRegistration(appId, username);
+          const signupToken = await beginRegistration(appId, username, apiUrl);
           // Store the signup token and username in localStorage incase the user closes the tab
           // before completing the verification
           localStorage.setItem("gopasswordlessSignupToken", signupToken);
@@ -229,7 +231,8 @@ export const GoPasswordlessComponent = ({
               ? username
               : localStorage.getItem("gopasswordlessUsername")!,
             verificationCode,
-            localStorage.getItem("gopasswordlessSignupToken")!
+            localStorage.getItem("gopasswordlessSignupToken")!,
+            apiUrl
           );
           localStorage.setItem("gopasswordlessAccessToken", resp.accessToken);
           onSignupCompleted?.({ accessToken: resp.accessToken });
@@ -244,7 +247,7 @@ export const GoPasswordlessComponent = ({
         break;
       case "login":
         try {
-          const loginResp = await login(appId, username);
+          const loginResp = await login(appId, username, apiUrl);
           localStorage.setItem(
             "gopasswordlessAccessToken",
             loginResp.accessToken
@@ -275,7 +278,7 @@ export const GoPasswordlessComponent = ({
 
   const handleResendVerificationCode = async () => {
     try {
-      await resendVerificationCode(appId, username);
+      await resendVerificationCode(appId, username, apiUrl);
       setVerificationCodeResent(true);
     } catch (e) {
       if (e instanceof Error) {
