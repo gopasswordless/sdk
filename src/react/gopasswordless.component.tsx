@@ -167,7 +167,7 @@ export interface GoPasswordlessComponentProps {
   appName: string;
   appLogo: string;
   screen: GoPasswordlessScreen;
-  apiUrl: string;
+  apiUrl?: string;
   onSignupStarted?: ({ signupToken }: { signupToken: string }) => void;
   onSignupCompleted?: ({ accessToken }: { accessToken: string }) => void;
   onLoginSuccess?: ({ accessToken }: { accessToken: string }) => void;
