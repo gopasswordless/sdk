@@ -2,17 +2,17 @@
 import { useState } from "react";
 import "./App.css";
 import { CardComponent } from "./components/card/card.component";
-import {
-  GoPasswordlessComponent,
-  GoPasswordlessScreen,
-} from "@gopasswordless/sdk";
+import { GoPasswordlessComponent, GoPasswordlessScreen } from "./sdk";
 
 export const App = (): JSX.Element => {
   const [screen, setScreen] = useState<GoPasswordlessScreen>("signup");
+  const [mode, setMode] = useState<"light" | "dark">("light");
 
   return (
     <div className="App">
       <div className="Container">
+        {" "}
+        {/* Adjusted the width here */}
         <CardComponent>
           <h2>Welcome to our demo!</h2>
           <p>
@@ -29,6 +29,14 @@ export const App = (): JSX.Element => {
             <option value="verify">Verify</option>
             <option value="profile">Profile</option>
           </select>
+          <h4>Mode</h4>
+          <select
+            value={mode}
+            onChange={(e) => setMode(e.target.value as "light" | "dark")}
+          >
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
           <h4>Implementation Code</h4>
           <pre>
             <code>
@@ -38,6 +46,7 @@ export const App = (): JSX.Element => {
   onSignupCompleted={(accessToken) => handleSignupCompleted()}
   onLoginSuccess={(accessToken) => handleLoginSuccess()}
   screen={'${screen}'}
+  mode={'${mode}'}
 />`}
             </code>
           </pre>
@@ -47,8 +56,14 @@ export const App = (): JSX.Element => {
         <GoPasswordlessComponent
           appId={process.env.REACT_APP_GOPASSWORDLESS_APP_ID || ""}
           appName="GoPasswordless Demo"
-          appLogo="https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo_vertical_dark.png"
+          appLogo={
+            mode === "dark"
+              ? "https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo_vertical_light.png"
+              : "https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo_vertical_dark.png"
+          }
           screen={screen}
+          mode={mode}
+          primaryColor={"#027bff"}
         />
       </div>
     </div>
