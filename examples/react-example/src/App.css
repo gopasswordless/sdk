@@ -1,9 +1,9 @@
 .App {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  place-items: center;
+  /* place-items: center; */
   height: 100vh;
-  padding: 0 20rem;
+  /* padding: 0 5rem; */
 }
 
 @media screen and (max-width: 600px) {
@@ -26,4 +26,58 @@
   border-radius: 4px;
   color: #333;
   font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .Controls {
+    display: none;
+  }
+  .Toggle {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .Controls {
+    display: flex;
+  }
+  .Toggle {
+    display: none;
+  }
+}
+
+.Toggle {
+  position: absolute;
+  display: none; /* Hide by default */
+  cursor: pointer;
+  right: 20px;
+  top: 20px;
+  z-index: 100;
+  width: 30px;
+  height: 25px;
+  background: transparent;
+  border: none;
+}
+
+.Toggle:before,
+.Toggle:after,
+.Toggle div {
+  background-color: #ffffff;
+  content: "";
+  display: block;
+  height: 3px;
+  margin: 6px 0;
+  transition: all 0.2s ease-in-out;
+}
+
+.Toggle:active div {
+  transform: scale(0.8);
+}
+
+.Toggle:active:before {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.Toggle:active:after {
+  transform: translateY(-9px) rotate(-45deg);
 }
