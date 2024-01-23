@@ -11,7 +11,7 @@ import { GoPasswordlessButtonComponent } from "./components/button/button.compon
 import root from "react-shadow";
 
 export type GoPasswordlessScreen = "signup" | "login" | "verify" | "profile";
-export type GoPasswordlessColorMode = "light" | "dark";
+export type GoPasswordlessColorMode = "light" | "dark" | "glass";
 
 export interface GoPasswordlessBaseComponentProps {
   appName: string;
@@ -41,7 +41,11 @@ export const GoPasswordlessBaseComponent = ({
             margin: 10px;
             border-radius: 10px;
             background-color: ${
-              mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "#ffffff"
+              mode === "dark"
+                ? "#06111f"
+                : mode === "light"
+                ? "#ffffff"
+                : "rgba(255, 255, 255, 0.01)" /* Assuming "glass" mode has a slightly more opaque white */
             };
             display: flex;
             justify-content: center;
@@ -52,7 +56,18 @@ export const GoPasswordlessBaseComponent = ({
             gap: 20px;
             text-align: center;
             box-sizing: border-box;
-            color: ${mode === "dark" ? "white" : "black"};
+            color: ${
+              mode === "dark"
+                ? "white"
+                : mode === "light"
+                ? "black"
+                : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+            };
+            border: ${
+              mode === "glass"
+                ? "1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.1);" /* Shiny light effect for glass mode border */
+                : "none"
+            };
           }
           
           .GoPasswordlessDivider {
@@ -74,7 +89,13 @@ export const GoPasswordlessBaseComponent = ({
             padding: 10px;
             border-radius: 5px;
             font-size: 16px;
-            color: ${mode === "dark" ? "#ffffff" : "#000000"};
+            color: ${
+              mode === "dark"
+                ? "#ffffff"
+                : mode === "light"
+                ? "#000000"
+                : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+            };
             outline: none;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
             width: 100%;
@@ -82,22 +103,39 @@ export const GoPasswordlessBaseComponent = ({
             background-color: ${
               mode === "dark"
                 ? "rgba(255, 255, 255, 0.046)"
-                : "rgba(0, 0, 0, 0.046)"
-            }; /* Adjusted for glassy effect based on mode */
+                : mode === "light"
+                ? "rgba(0, 0, 0, 0.046)"
+                : "rgba(255, 255, 255, 0.1)" /* Assuming "glass" mode has a slightly more opaque effect */
+            };
             border: none; /* No border */
-            // box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px); /* This will give the blur effect */
             ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
               color: ${
-                mode === "dark" ? "#e3e3e3" : "#505050"
+                mode === "dark"
+                  ? "#e3e3e3"
+                  : mode === "light"
+                  ? "#505050"
+                  : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
               }; /* Adjusted placeholder color based on mode */
               opacity: 1; /* Firefox */
             }
             :-ms-input-placeholder { /* Internet Explorer 10-11 */
-              color: ${mode === "dark" ? "#b3b3b3" : "#666666"};
+              color: ${
+                mode === "dark"
+                  ? "#b3b3b3"
+                  : mode === "light"
+                  ? "#666666"
+                  : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+              };
             }
             ::-ms-input-placeholder { /* Microsoft Edge */
-              color: ${mode === "dark" ? "#b3b3b3" : "#666666"};
+              color: ${
+                mode === "dark"
+                  ? "#b3b3b3"
+                  : mode === "light"
+                  ? "#666666"
+                  : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+              };
             }
           }
           
@@ -133,6 +171,11 @@ export const GoPasswordlessBaseComponent = ({
             font-size: 16px;
             margin: 4px 2px;
             transition: background-color 0.3s ease;
+          }
+
+          .GoPasswordlessButton:hover {
+            background-color: ${primaryColor};
+            opacity: 0.9;
           }
           
           .GoPasswordlessLoading {

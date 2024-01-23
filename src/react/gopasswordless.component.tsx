@@ -11,16 +11,21 @@ import { GoPasswordlessButtonComponent } from "./components/button/button.compon
 import root from "react-shadow";
 
 export type GoPasswordlessScreen = "signup" | "login" | "verify" | "profile";
+export type GoPasswordlessColorMode = "light" | "dark" | "glass";
 
 export interface GoPasswordlessBaseComponentProps {
   appName: string;
   appLogo: string;
+  mode: GoPasswordlessColorMode;
+  primaryColor: string;
   children: ReactNode | ReactNode[];
 }
 
 export const GoPasswordlessBaseComponent = ({
   appName,
   appLogo,
+  mode,
+  primaryColor,
   children,
 }: GoPasswordlessBaseComponentProps): JSX.Element => {
   return (
@@ -32,11 +37,16 @@ export const GoPasswordlessBaseComponent = ({
           }
           
           .GoPasswordlessWidget {
-            border: 1px solid #ddd;
             padding: 15px 40px;
             margin: 10px;
             border-radius: 10px;
-            background-color: #ffffff;
+            background-color: ${
+              mode === "dark"
+                ? "#06111f"
+                : mode === "light"
+                ? "#ffffff"
+                : "rgba(255, 255, 255, 0.01)" /* Assuming "glass" mode has a slightly more opaque white */
+            };
             display: flex;
             justify-content: center;
             align-items: center;
@@ -46,6 +56,18 @@ export const GoPasswordlessBaseComponent = ({
             gap: 20px;
             text-align: center;
             box-sizing: border-box;
+            color: ${
+              mode === "dark"
+                ? "white"
+                : mode === "light"
+                ? "black"
+                : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+            };
+            border: ${
+              mode === "glass"
+                ? "1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.1);" /* Shiny light effect for glass mode border */
+                : "none"
+            };
           }
           
           .GoPasswordlessDivider {
@@ -65,14 +87,56 @@ export const GoPasswordlessBaseComponent = ({
           
           .GoPasswordlessInput {
             padding: 10px;
-            border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
-            color: #333;
+            color: ${
+              mode === "dark"
+                ? "#ffffff"
+                : mode === "light"
+                ? "#000000"
+                : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+            };
             outline: none;
-            transition: border-color 0.3s ease;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
             width: 100%;
             box-sizing: border-box;
+            background-color: ${
+              mode === "dark"
+                ? "rgba(255, 255, 255, 0.046)"
+                : mode === "light"
+                ? "rgba(0, 0, 0, 0.046)"
+                : "rgba(255, 255, 255, 0.1)" /* Assuming "glass" mode has a slightly more opaque effect */
+            };
+            border: none; /* No border */
+            backdrop-filter: blur(10px); /* This will give the blur effect */
+            ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+              color: ${
+                mode === "dark"
+                  ? "#e3e3e3"
+                  : mode === "light"
+                  ? "#505050"
+                  : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+              }; /* Adjusted placeholder color based on mode */
+              opacity: 1; /* Firefox */
+            }
+            :-ms-input-placeholder { /* Internet Explorer 10-11 */
+              color: ${
+                mode === "dark"
+                  ? "#b3b3b3"
+                  : mode === "light"
+                  ? "#666666"
+                  : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+              };
+            }
+            ::-ms-input-placeholder { /* Microsoft Edge */
+              color: ${
+                mode === "dark"
+                  ? "#b3b3b3"
+                  : mode === "light"
+                  ? "#666666"
+                  : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+              };
+            }
           }
           
           .GoPasswordlessInputError {
@@ -95,7 +159,7 @@ export const GoPasswordlessBaseComponent = ({
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            background-color: #007bff;
+            background-color: ${primaryColor};
             color: #ffffff;
             font-size: 16px;
             cursor: pointer;
@@ -107,6 +171,11 @@ export const GoPasswordlessBaseComponent = ({
             font-size: 16px;
             margin: 4px 2px;
             transition: background-color 0.3s ease;
+          }
+
+          .GoPasswordlessButton:hover {
+            background-color: ${primaryColor};
+            opacity: 0.9;
           }
           
           .GoPasswordlessLoading {
@@ -167,6 +236,8 @@ export interface GoPasswordlessComponentProps {
   appName: string;
   appLogo: string;
   screen: GoPasswordlessScreen;
+  mode: GoPasswordlessColorMode;
+  primaryColor: string;
   apiUrl?: string;
   onSignupStarted?: ({ signupToken }: { signupToken: string }) => void;
   onSignupCompleted?: ({ accessToken }: { accessToken: string }) => void;
@@ -178,6 +249,8 @@ export const GoPasswordlessComponent = ({
   appName,
   appLogo,
   screen,
+  mode,
+  primaryColor,
   apiUrl = "https://api.gopasswordless.dev/v1",
   onSignupStarted,
   onSignupCompleted,
@@ -292,7 +365,12 @@ export const GoPasswordlessComponent = ({
   switch (currentScreen) {
     case "signup":
       return (
-        <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
+        <GoPasswordlessBaseComponent
+          appLogo={appLogo}
+          appName={appName}
+          mode={mode}
+          primaryColor={primaryColor}
+        >
           <h3 style={{ fontWeight: "normal" }}>Signup to {appName}</h3>
           <GoPasswordlessInputComponent
             placeholder="Enter email or phone number"
@@ -320,7 +398,12 @@ export const GoPasswordlessComponent = ({
       );
     case "verify":
       return (
-        <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
+        <GoPasswordlessBaseComponent
+          appLogo={appLogo}
+          appName={appName}
+          mode={mode}
+          primaryColor={primaryColor}
+        >
           <h3 style={{ fontWeight: "normal" }}>
             Verify your {appName} account
           </h3>
@@ -355,7 +438,12 @@ export const GoPasswordlessComponent = ({
       );
     case "login":
       return (
-        <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
+        <GoPasswordlessBaseComponent
+          appLogo={appLogo}
+          appName={appName}
+          mode={mode}
+          primaryColor={primaryColor}
+        >
           <h3 style={{ fontWeight: "normal" }}>Log in to {appName}</h3>
           <GoPasswordlessInputComponent
             placeholder="Enter email or phone number"
@@ -383,7 +471,12 @@ export const GoPasswordlessComponent = ({
       );
     case "profile":
       return (
-        <GoPasswordlessBaseComponent appLogo={appLogo} appName={appName}>
+        <GoPasswordlessBaseComponent
+          appLogo={appLogo}
+          appName={appName}
+          mode={mode}
+          primaryColor={primaryColor}
+        >
           <span className="GoPasswordlessLink" onClick={handleLogout}>
             Logout
           </span>
