@@ -22,7 +22,6 @@ export const App = (): JSX.Element => {
             : "https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo.png",
         primaryColour: "#027bff",
         theme: mode,
-        apiUrl: "http://localhost:8080/v1",
         privacyUrl:
           "https://gopasswordless.s3.eu-west-2.amazonaws.com/privacy.html",
         termsUrl:
