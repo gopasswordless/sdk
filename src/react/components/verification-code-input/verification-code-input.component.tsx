@@ -9,11 +9,13 @@ import { GoPasswordlessInputComponent } from "../input/input.component";
 
 export interface VerificationCodeInputProps {
   onChange: (verificationCode: string) => void;
+  onKeyDown: (event: React.KeyboardEvent) => void;
   error?: string;
 }
 
 export const VerificationCodeInput = ({
   onChange,
+  onKeyDown,
   error,
 }: VerificationCodeInputProps): JSX.Element => {
   const [code, setCode] = useState<string[]>(Array(6).fill("")); // Initialize an array of 6 empty strings
@@ -67,6 +69,7 @@ export const VerificationCodeInput = ({
             maxLength={1}
             value={digit}
             onChange={(e: any) => handleChange(index, e)}
+            onKeyDown={onKeyDown}
             error={error}
             displayErrorMessage={false}
           />
