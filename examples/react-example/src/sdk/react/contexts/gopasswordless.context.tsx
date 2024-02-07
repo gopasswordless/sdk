@@ -19,6 +19,8 @@ export interface GoPasswordlessSettings {
   theme: "light" | "dark" | "glass";
   primaryColour: string;
   apiUrl?: string;
+  termsUrl?: string;
+  privacyUrl?: string;
 }
 
 export interface GoPasswordlessContextType {
@@ -215,6 +217,8 @@ export const GoPasswordlessContextProvider = ({
 
   const logout = () => {
     setToken(undefined);
+    localStorage.removeItem("gopasswordlessAccessToken");
+    setCurrentScreen("login");
   };
 
   const contextValue: GoPasswordlessContextType = {

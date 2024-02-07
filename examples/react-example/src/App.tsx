@@ -18,11 +18,15 @@ export const App = (): JSX.Element => {
         appName: "GoPasswordless Demo",
         appLogo:
           mode === "dark" || mode === "glass"
-            ? "https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo_vertical_light.png"
-            : "https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo_vertical_dark.png",
+            ? "https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo-light.png"
+            : "https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo.png",
         primaryColour: "#027bff",
         theme: mode,
         apiUrl: "http://localhost:8080/v1",
+        privacyUrl:
+          "https://gopasswordless.s3.eu-west-2.amazonaws.com/privacy.html",
+        termsUrl:
+          "https://gopasswordless.s3.eu-west-2.amazonaws.com/privacy.html",
       }}
     >
       <div className="App" style={{ gap: isMobile ? "2rem" : "0" }}>

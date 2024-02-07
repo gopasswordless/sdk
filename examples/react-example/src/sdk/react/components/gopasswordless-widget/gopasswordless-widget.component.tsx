@@ -10,7 +10,7 @@ const GoPasswordlessBaseComponent = ({
 }: {
   children: ReactNode | ReactNode[];
 }): JSX.Element => {
-  const { settings } = useGoPasswordlessContext();
+  const { settings, token, logout } = useGoPasswordlessContext();
 
   return (
     <root.div>
@@ -21,7 +21,7 @@ const GoPasswordlessBaseComponent = ({
             }
             
             .GoPasswordlessWidget {
-              padding: 15px 40px;
+              padding: 15px 30px;
               margin: 10px;
               border-radius: 10px;
               background-color: ${
@@ -32,11 +32,11 @@ const GoPasswordlessBaseComponent = ({
                   : "rgba(255, 255, 255, 0.01)" /* Assuming "glass" mode has a slightly more opaque white */
               };
               display: flex;
-              justify-content: center;
+              justify-content: space-around;
               align-items: center;
               flex-direction: column;
               width: 360px;
-              height: 450px;
+              height: 400px;
               gap: 20px;
               text-align: center;
               box-sizing: border-box;
@@ -198,17 +198,64 @@ const GoPasswordlessBaseComponent = ({
               100% {
                 opacity: 0;
               }
-            }          
+            }
+            
+            a {
+              text-decoration: none;
+              color: ${settings.primaryColour};
+            }
           `}
       </style>
 
       <div className="GoPasswordlessWidget">
-        <img
-          className="GoPasswordlessLogo"
-          src={settings.appLogo}
-          alt={`${settings.appName} logo`}
-        />
-        {children}
+        <div
+          style={{
+            height: "40%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <img
+            className="GoPasswordlessLogo"
+            src={settings.appLogo}
+            alt={`${settings.appName} logo`}
+            style={{ width: "80%" }}
+          />
+        </div>
+        <div
+          style={{
+            height: "40%",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            justifyContent: "start",
+            width: "100%",
+          }}
+        >
+          {children}
+        </div>
+        <div style={{ height: "20%" }}>
+          {!token && (
+            <p style={{ fontSize: "12px" }}>
+              By logging in you agree to our{" "}
+              <a href={settings.termsUrl} target="_blank" rel="noreferrer">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href={settings.privacyUrl} target="_blank" rel="noreferrer">
+                Privacy Policy
+              </a>
+              .
+            </p>
+          )}
+          {token && (
+            <GoPasswordlessButtonComponent onClick={logout} type="button">
+              Logout
+            </GoPasswordlessButtonComponent>
+          )}
+        </div>
       </div>
     </root.div>
   );
@@ -240,7 +287,6 @@ export const GoPasswordlessWidgetComponent = () => {
     case "login":
       return (
         <GoPasswordlessBaseComponent>
-          <h3 style={{ fontWeight: "normal" }}>Login or signup</h3>
           <GoPasswordlessInputComponent
             placeholder="Enter email or phone number"
             onChange={(e) => setUsername(e.target.value)}
@@ -284,13 +330,13 @@ export const GoPasswordlessWidgetComponent = () => {
     case "passkey":
       return (
         <GoPasswordlessBaseComponent>
-          <h3 style={{ fontWeight: "normal" }}>
-            Unlock your {settings.appName} passkey
-          </h3>
-          <div style={{ display: "flex", gap: "20px" }}>
+          <h3 style={{ fontWeight: "normal" }}>Unlock your passkey</h3>
+          <div
+            style={{ display: "flex", gap: "20px", justifyContent: "center" }}
+          >
             <svg
-              width="113"
-              height="113"
+              width="80"
+              height="80"
               viewBox="0 0 113 113"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -302,8 +348,8 @@ export const GoPasswordlessWidgetComponent = () => {
               />
             </svg>
             <svg
-              width="98"
-              height="98"
+              width="65"
+              height="65"
               viewBox="0 0 98 98"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
