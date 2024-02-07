@@ -10,7 +10,7 @@ const GoPasswordlessBaseComponent = ({
 }: {
   children: ReactNode | ReactNode[];
 }): JSX.Element => {
-  const { settings, token, logout } = useGoPasswordlessContext();
+  const { settings, token, currentScreen, logout } = useGoPasswordlessContext();
 
   return (
     <root.div>
@@ -36,7 +36,7 @@ const GoPasswordlessBaseComponent = ({
               align-items: center;
               flex-direction: column;
               width: 360px;
-              height: 400px;
+              height: 420px;
               gap: 20px;
               text-align: center;
               box-sizing: border-box;
@@ -239,7 +239,7 @@ const GoPasswordlessBaseComponent = ({
           {children}
         </div>
         <div style={{ height: "20%" }}>
-          {!token && (
+          {currentScreen === "login" && (
             <p style={{ fontSize: "12px" }}>
               By logging in you agree to our{" "}
               <a href={settings.termsUrl} target="_blank" rel="noreferrer">
@@ -285,6 +285,16 @@ export const GoPasswordlessWidgetComponent = () => {
     verify({ code: verificationCode });
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      if (currentScreen === "login") {
+        handleLoginSubmit();
+      } else if (currentScreen === "verify") {
+        handleVerifySubmit();
+      }
+    }
+  };
+
   switch (currentScreen) {
     case "login":
       return (
@@ -292,6 +302,7 @@ export const GoPasswordlessWidgetComponent = () => {
           <GoPasswordlessInputComponent
             placeholder="Enter email or phone number"
             onChange={(e) => setUsername(e.target.value)}
+            onKeyDown={handleKeyPress}
             error={error}
           />
           <GoPasswordlessButtonComponent
@@ -311,6 +322,7 @@ export const GoPasswordlessWidgetComponent = () => {
           </h3>
           <VerificationCodeInput
             onChange={(code) => setVerificationCode(code)}
+            onKeyDown={handleKeyPress}
             error={error}
           />
           <GoPasswordlessButtonComponent
@@ -320,7 +332,6 @@ export const GoPasswordlessWidgetComponent = () => {
           >
             Verify
           </GoPasswordlessButtonComponent>
-          <div className="GoPasswordlessDivider" />
           <p>
             Didn't receive a code?{" "}
             <span className="GoPasswordlessLink" onClick={resendCode}>

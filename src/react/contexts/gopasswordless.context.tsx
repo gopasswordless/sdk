@@ -136,7 +136,7 @@ export const GoPasswordlessContextProvider = ({
       );
       setToken(resp.accessToken);
       setSignupToken(undefined);
-      localStorage.removeItem("goPasswordlessSignupToken");
+      localStorage.removeItem("gopasswordlessSignupToken");
     } catch (e) {
       if (e instanceof Error) {
         setError(e.message);
