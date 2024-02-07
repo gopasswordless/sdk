@@ -50,6 +50,8 @@ const GoPasswordlessBaseComponent = ({
               border: ${
                 settings.theme === "glass"
                   ? "1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.1);" /* Shiny light effect for glass mode border */
+                  : settings.theme === "light"
+                  ? "1px solid #f1f1f1"
                   : "none"
               };
             }
