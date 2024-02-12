@@ -300,7 +300,7 @@ export const GoPasswordlessWidgetComponent = () => {
       return (
         <GoPasswordlessBaseComponent>
           <GoPasswordlessInputComponent
-            placeholder="Enter email or phone number"
+            placeholder="Enter your email address"
             onChange={(e) => setUsername(e.target.value)}
             onKeyDown={handleKeyPress}
             error={error}
