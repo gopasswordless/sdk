@@ -11,6 +11,7 @@ import {
   login as baseLogin,
   resendVerificationCode,
 } from "../../browser";
+import { decodeJwt } from "jose";
 
 export interface GoPasswordlessSettings {
   appId: string;
@@ -83,7 +84,24 @@ export const GoPasswordlessContextProvider = ({
 
   useEffect(() => {
     if (localStorage.getItem("gopasswordlessAccessToken")) {
-      setToken(localStorage.getItem("gopasswordlessAccessToken") || undefined);
+      const tokenFromStorage = localStorage.getItem(
+        "gopasswordlessAccessToken"
+      );
+
+      // Check token hasn't expired
+      const decoded = decodeJwt(tokenFromStorage!);
+
+      if (decoded.exp && decoded.exp < Date.now()) {
+        setToken(undefined);
+        localStorage.removeItem("gopasswordlessAccessToken");
+        setCurrentScreen("login");
+        setSignupToken(undefined);
+        localStorage.removeItem("gopasswordlessSignupToken");
+        setUsername(undefined);
+        localStorage.removeItem("gopasswordlessUsername");
+      } else {
+        setToken(tokenFromStorage || undefined);
+      }
     }
   }, []);
 
