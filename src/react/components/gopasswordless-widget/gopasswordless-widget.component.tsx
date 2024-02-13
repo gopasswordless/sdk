@@ -332,7 +332,7 @@ export const GoPasswordlessWidgetComponent = () => {
           >
             Verify
           </GoPasswordlessButtonComponent>
-          <p>
+          <p style={{ fontSize: "12px" }}>
             Didn't receive a code?{" "}
             <span className="GoPasswordlessLink" onClick={resendCode}>
               Resend
