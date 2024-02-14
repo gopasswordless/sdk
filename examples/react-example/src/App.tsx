@@ -3,7 +3,7 @@ import "./App.css";
 import {
   GoPasswordlessContextProvider,
   GoPasswordlessWidgetComponent,
-} from "@gopasswordless/sdk";
+} from "./sdk";
 
 export const App = (): JSX.Element => {
   const [mode, setMode] = useState<"light" | "dark" | "glass">("light");
