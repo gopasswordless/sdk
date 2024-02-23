@@ -3,7 +3,7 @@ import "./App.css";
 import {
   GoPasswordlessContextProvider,
   GoPasswordlessWidgetComponent,
-} from "@gopasswordless/sdk";
+} from "./sdk";
 
 export const App = (): JSX.Element => {
   const [mode, setMode] = useState<"light" | "dark" | "glass">("light");
@@ -26,6 +26,7 @@ export const App = (): JSX.Element => {
           "https://gopasswordless.s3.eu-west-2.amazonaws.com/privacy.html",
         termsUrl:
           "https://gopasswordless.s3.eu-west-2.amazonaws.com/privacy.html",
+        apiUrl: "http://localhost:8080/v1",
       }}
     >
       <div className="App" style={{ gap: isMobile ? "2rem" : "0" }}>
