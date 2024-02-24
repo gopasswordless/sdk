@@ -6,7 +6,7 @@
   /* padding: 0 5rem; */
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
   .App {
     grid-template-columns: 1fr;
     padding: 0;
@@ -26,6 +26,16 @@
   border-radius: 4px;
   color: #333;
   font-size: 1rem;
+}
+
+.App input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  color: #333;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {

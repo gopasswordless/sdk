@@ -5,17 +5,19 @@ import React, {
   ClipboardEvent,
   ChangeEvent,
 } from "react";
-import { GoPasswordlessInputComponent } from "../input/input.component";
+import { InputComponent } from "../input/input.component";
 
 export interface VerificationCodeInputProps {
   onChange: (verificationCode: string) => void;
   onKeyDown: (event: React.KeyboardEvent) => void;
+  theme: "light" | "dark" | "glass";
   error?: string;
 }
 
 export const VerificationCodeInput = ({
   onChange,
   onKeyDown,
+  theme,
   error,
 }: VerificationCodeInputProps): JSX.Element => {
   const [code, setCode] = useState<string[]>(Array(6).fill("")); // Initialize an array of 6 empty strings
@@ -59,10 +61,10 @@ export const VerificationCodeInput = ({
     <div>
       <div
         onPaste={handlePaste}
-        className="GoPasswordlessVerificationCodeInput"
+        style={{ display: "flex", flexDirection: "row", gap: "5px" }}
       >
         {code.map((digit, index) => (
-          <GoPasswordlessInputComponent
+          <InputComponent
             key={index}
             ref={inputRefs[index]}
             type="text"
@@ -72,6 +74,8 @@ export const VerificationCodeInput = ({
             onKeyDown={onKeyDown}
             error={error}
             displayErrorMessage={false}
+            theme={theme}
+            style={{ textAlign: "center" }}
           />
         ))}
       </div>

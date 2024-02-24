@@ -11,7 +11,6 @@ import {
   login as baseLogin,
   resendVerificationCode,
 } from "../../browser";
-import { decodeJwt } from "jose";
 
 export interface GoPasswordlessSettings {
   appId: string;
@@ -54,70 +53,39 @@ export const GoPasswordlessContextProvider = ({
   const [currentScreen, setCurrentScreen] = useState<
     "login" | "passkey" | "verify" | "complete"
   >("login");
-  const [token, setToken] = useState<string | undefined>(undefined);
-  const [username, setUsername] = useState<string | undefined>(undefined);
-  const [signupToken, setSignupToken] = useState<string | undefined>(undefined);
+  const [token, setToken] = useState<string | undefined>(
+    localStorage.getItem("gopasswordless_access_token") || undefined
+  );
+  const [username, setUsername] = useState<string | undefined>(
+    localStorage.getItem("gopasswordless_username") || undefined
+  );
+  const [signupToken, setSignupToken] = useState<string | undefined>(
+    localStorage.getItem("gopasswordless_signup_token") || undefined
+  );
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem("gopasswordlessAccessToken", token);
+      localStorage.setItem("gopasswordless_access_token", token);
       setCurrentScreen("complete");
       setSignupToken(undefined);
-      localStorage.removeItem("goPasswordlessSignupToken");
+      localStorage.removeItem("gopasswordless_signup_token");
     }
   }, [token]);
 
   useEffect(() => {
     if (signupToken) {
-      localStorage.setItem("gopasswordlessSignupToken", signupToken);
+      localStorage.setItem("gopasswordless_signup_token", signupToken);
       setCurrentScreen("verify");
     }
   }, [signupToken]);
 
   useEffect(() => {
     if (username) {
-      localStorage.setItem("gopasswordlessUsername", username);
+      localStorage.setItem("gopasswordless_username", username);
     }
   }, [username]);
-
-  useEffect(() => {
-    if (localStorage.getItem("gopasswordlessAccessToken")) {
-      const tokenFromStorage = localStorage.getItem(
-        "gopasswordlessAccessToken"
-      );
-
-      // Check token hasn't expired
-      const decoded = decodeJwt(tokenFromStorage!);
-
-      if (decoded.exp && decoded.exp < Date.now()) {
-        setToken(undefined);
-        localStorage.removeItem("gopasswordlessAccessToken");
-        setCurrentScreen("login");
-        setSignupToken(undefined);
-        localStorage.removeItem("gopasswordlessSignupToken");
-        setUsername(undefined);
-        localStorage.removeItem("gopasswordlessUsername");
-      } else {
-        setToken(tokenFromStorage || undefined);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (localStorage.getItem("gopasswordlessSignupToken")) {
-      setSignupToken(
-        localStorage.getItem("gopasswordlessSignupToken") || undefined
-      );
-    }
-  }, []);
-
-  useEffect(() => {
-    if (localStorage.getItem("gopasswordlessUsername")) {
-      setUsername(localStorage.getItem("gopasswordlessUsername") || undefined);
-    }
-  }, []);
 
   const register = async ({ username }: { username: string }) => {
     setLoading(true);
@@ -235,7 +203,7 @@ export const GoPasswordlessContextProvider = ({
 
   const logout = () => {
     setToken(undefined);
-    localStorage.removeItem("gopasswordlessAccessToken");
+    localStorage.removeItem("gopasswordless_access_token");
     setCurrentScreen("login");
   };
 
