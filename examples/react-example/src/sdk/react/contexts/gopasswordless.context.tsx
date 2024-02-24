@@ -203,7 +203,7 @@ export const GoPasswordlessContextProvider = ({
 
   const logout = () => {
     setToken(undefined);
-    localStorage.removeItem("gopasswordlessAccessToken");
+    localStorage.removeItem("gopasswordless_access_token");
     setCurrentScreen("login");
   };
 

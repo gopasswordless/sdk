@@ -1,15 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import {
   GoPasswordlessContextProvider,
   GoPasswordlessWidgetComponent,
+  GoPasswordlessDrawerComponent,
 } from "./sdk";
 
 export const App = (): JSX.Element => {
   const [mode, setMode] = useState<"light" | "dark" | "glass">("light");
   const [showContainer, setShowContainer] = useState(window.innerWidth > 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  const isMobile = window.innerWidth <= 768;
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Call handleResize immediately to set initial state
+    handleResize();
+
+    // Remove event listener on cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
   return (
     <GoPasswordlessContextProvider
@@ -84,7 +99,8 @@ export const App = (): JSX.Element => {
           </select>
         </div>
         <div className="Container">
-          <GoPasswordlessWidgetComponent />
+          {!isMobile && <GoPasswordlessWidgetComponent />}
+          {isMobile && <GoPasswordlessDrawerComponent />}
         </div>
       </div>
     </GoPasswordlessContextProvider>

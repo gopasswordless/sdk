@@ -1,9 +1,11 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useGoPasswordlessContext } from "../../contexts";
 import root from "react-shadow";
-import { GoPasswordlessInputComponent } from "../input/input.component";
-import { GoPasswordlessButtonComponent } from "../button/button.component";
+import { InputComponent } from "../input/input.component";
+import { ButtonComponent } from "../button/button.component";
 import { VerificationCodeInput } from "../verification-code-input/verification-code-input.component";
+import { LinkComponent } from "../link/link.component";
+import { StyleSheetManager } from "styled-components";
 
 const GoPasswordlessBaseComponent = ({
   children,
@@ -11,253 +13,126 @@ const GoPasswordlessBaseComponent = ({
   children: ReactNode | ReactNode[];
 }): JSX.Element => {
   const { settings, token, currentScreen, logout } = useGoPasswordlessContext();
+  const [render, setRender] = useState<number>(0);
+  const shadowRootRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    setRender((prev) => prev + 1);
+  }, [shadowRootRef.current]);
 
   return (
-    <root.div>
-      <style>
-        {`
-            .GoPasswordlessLogo {
-              width: 50%;
-            }
-            
-            .GoPasswordlessWidget {
-              padding: 15px 30px;
-              margin: 10px;
-              border-radius: 10px;
-              background-color: ${
-                settings.theme === "dark"
-                  ? "#06111f"
-                  : settings.theme === "light"
-                  ? "#ffffff"
-                  : "rgba(255, 255, 255, 0.01)" /* Assuming "glass" mode has a slightly more opaque white */
-              };
-              display: flex;
-              justify-content: space-around;
-              align-items: center;
-              flex-direction: column;
-              width: 360px;
-              height: 420px;
-              gap: 20px;
-              text-align: center;
-              box-sizing: border-box;
-              color: ${
-                settings.theme === "dark"
-                  ? "white"
-                  : settings.theme === "light"
-                  ? "black"
-                  : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
-              };
-              border: ${
-                settings.theme === "glass"
-                  ? "1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.1);" /* Shiny light effect for glass mode border */
-                  : settings.theme === "light"
-                  ? "1px solid #f1f1f1"
-                  : "none"
-              };
-            }
-            
-            .GoPasswordlessDivider {
-              height: 1px;
-              border-top: 1px solid #ddd;
-              margin: 10px 0;
-              width: 100%;
-            }
-            
-            .GoPasswordlessLink {
-              color: #007bff;
-            }
-            
-            .GoPasswordlessLink:hover {
-              cursor: pointer;
-            }
-            
-            .GoPasswordlessInput {
-              padding: 10px;
-              border-radius: 5px;
-              font-size: 16px;
-              color: ${
-                settings.theme === "dark"
-                  ? "#ffffff"
-                  : settings.theme === "light"
-                  ? "#000000"
-                  : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
-              };
-              outline: none;
-              transition: background-color 0.3s ease, box-shadow 0.3s ease;
-              width: 100%;
-              box-sizing: border-box;
-              background-color: ${
-                settings.theme === "dark"
-                  ? "rgba(255, 255, 255, 0.046)"
-                  : settings.theme === "light"
-                  ? "rgba(0, 0, 0, 0.046)"
-                  : "rgba(255, 255, 255, 0.1)" /* Assuming "glass" mode has a slightly more opaque effect */
-              };
-              border: none; /* No border */
-              backdrop-filter: blur(10px); /* This will give the blur effect */
-              ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-                color: ${
-                  settings.theme === "dark"
-                    ? "#e3e3e3"
-                    : settings.theme === "light"
-                    ? "#505050"
-                    : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
-                }; /* Adjusted placeholder color based on mode */
-                opacity: 1; /* Firefox */
+    <root.div ref={shadowRootRef}>
+      <div
+        style={{
+          padding: "15px 30px",
+          margin: "10px",
+          borderRadius: "10px",
+          backgroundColor: `${
+            settings.theme === "dark"
+              ? "#06111f"
+              : settings.theme === "light"
+              ? "#ffffff"
+              : "rgba(255, 255, 255, 0.01)" /* Assuming "glass" mode has a slightly more opaque white */
+          }`,
+          display: "flex",
+          justifyContent: "space-around",
+          alignItems: "center",
+          flexDirection: "column",
+          width: "360px",
+          height: "420px",
+          gap: "20px",
+          textAlign: "center",
+          boxSizing: "border-box",
+          color: `${
+            settings.theme === "dark"
+              ? "white"
+              : settings.theme === "light"
+              ? "black"
+              : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+          }`,
+          border: `${
+            settings.theme === "glass"
+              ? "1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.1);" /* Shiny light effect for glass mode border */
+              : settings.theme === "light"
+              ? "1px solid #f1f1f1"
+              : "none"
+          }`,
+        }}
+      >
+        {shadowRootRef.current &&
+          shadowRootRef.current.shadowRoot &&
+          shadowRootRef.current.shadowRoot.firstElementChild && (
+            <StyleSheetManager
+              target={
+                shadowRootRef.current.shadowRoot
+                  .firstElementChild as HTMLElement
               }
-              :-ms-input-placeholder { /* Internet Explorer 10-11 */
-                color: ${
-                  settings.theme === "dark"
-                    ? "#b3b3b3"
-                    : settings.theme === "light"
-                    ? "#666666"
-                    : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
-                };
-              }
-              ::-ms-input-placeholder { /* Microsoft Edge */
-                color: ${
-                  settings.theme === "dark"
-                    ? "#b3b3b3"
-                    : settings.theme === "light"
-                    ? "#666666"
-                    : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
-                };
-              }
-            }
-            
-            .GoPasswordlessInputError {
-              border-color: red;
-              background-color: rgb(255, 216, 216);
-            }
-            
-            .GoPasswordlessErrorMessage {
-              color: red;
-              font-size: 12px;
-              margin-top: 5px;
-            }    
-  
-            .GoPasswordlessVerificationCodeInput {
-              display: flex;
-              gap: 5px;
-            }
-             
-            .GoPasswordlessButton {
-              padding: 10px 20px;
-              border: none;
-              border-radius: 5px;
-              background-color: ${settings.primaryColour};
-              color: #ffffff;
-              font-size: 16px;
-              cursor: pointer;
-              width: 100%;
-              border: none;
-              text-align: center;
-              text-decoration: none;
-              display: inline-block;
-              font-size: 16px;
-              margin: 4px 2px;
-              transition: background-color 0.3s ease;
-            }
-  
-            .GoPasswordlessButton:hover {
-              background-color: ${settings.primaryColour};
-              opacity: 0.9;
-            }
-            
-            .GoPasswordlessLoading {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              height: 18.5px;
-            }
-            
-            .GoPasswordlessLoadingDot {
-              width: 5px;
-              height: 5px;
-              border: 2px solid white;
-              border-radius: 50%;
-              float: left;
-              margin: 0 5px;
-              transform: scale(0);
-              animation: fx 1000ms ease infinite;
-            }
-            
-            .GoPasswordlessLoadingDot:nth-child(2) {
-              animation: fx 1000ms ease infinite;
-              animation-delay: 300ms;
-            }
-            
-            .GoPasswordlessLoadingDot:nth-child(3) {
-              animation: fx 1000ms ease infinite;
-              animation-delay: 600ms;
-            }
-            
-            @keyframes fx {
-              50% {
-                transform: scale(1);
-                opacity: 1;
-              }
-              100% {
-                opacity: 0;
-              }
-            }
-            
-            a {
-              text-decoration: none;
-              color: ${settings.primaryColour};
-            }
-          `}
-      </style>
-
-      <div className="GoPasswordlessWidget">
-        <div
-          style={{
-            height: "40%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <img
-            className="GoPasswordlessLogo"
-            src={settings.appLogo}
-            alt={`${settings.appName} logo`}
-            style={{ width: "80%" }}
-          />
-        </div>
-        <div
-          style={{
-            height: "40%",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            justifyContent: "start",
-            width: "100%",
-          }}
-        >
-          {children}
-        </div>
-        <div style={{ height: "20%" }}>
-          {currentScreen === "login" && (
-            <p style={{ fontSize: "12px" }}>
-              By logging in you agree to our{" "}
-              <a href={settings.termsUrl} target="_blank" rel="noreferrer">
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a href={settings.privacyUrl} target="_blank" rel="noreferrer">
-                Privacy Policy
-              </a>
-              .
-            </p>
+              key={render}
+            >
+              <div
+                style={{
+                  height: "40%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
+                <img
+                  className="GoPasswordlessLogo"
+                  src={settings.appLogo}
+                  alt={`${settings.appName} logo`}
+                  style={{ width: "80%" }}
+                />
+              </div>
+              <div
+                style={{
+                  height: "40%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  justifyContent: "start",
+                  width: "100%",
+                }}
+              >
+                {children}
+              </div>
+              <div style={{ height: "20%" }}>
+                {currentScreen === "login" && (
+                  <p style={{ fontSize: "12px" }}>
+                    By logging in you agree to our{" "}
+                    <LinkComponent
+                      href={settings.termsUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      color={settings.primaryColour}
+                    >
+                      Terms of Service
+                    </LinkComponent>{" "}
+                    and{" "}
+                    <LinkComponent
+                      href={settings.privacyUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      color={settings.primaryColour}
+                    >
+                      Privacy Policy
+                    </LinkComponent>
+                    .
+                  </p>
+                )}
+                {token && (
+                  <ButtonComponent
+                    onClick={logout}
+                    type="button"
+                    backgroundColour={settings.primaryColour}
+                  >
+                    Logout
+                  </ButtonComponent>
+                )}
+              </div>
+            </StyleSheetManager>
           )}
-          {token && (
-            <GoPasswordlessButtonComponent onClick={logout} type="button">
-              Logout
-            </GoPasswordlessButtonComponent>
-          )}
-        </div>
       </div>
     </root.div>
   );
@@ -299,19 +174,21 @@ export const GoPasswordlessWidgetComponent = () => {
     case "login":
       return (
         <GoPasswordlessBaseComponent>
-          <GoPasswordlessInputComponent
+          <InputComponent
             placeholder="Enter your email address"
             onChange={(e) => setUsername(e.target.value)}
             onKeyDown={handleKeyPress}
             error={error}
+            theme={settings.theme}
           />
-          <GoPasswordlessButtonComponent
+          <ButtonComponent
             onClick={handleLoginSubmit}
             type="button"
             loading={loading}
+            backgroundColour={settings.primaryColour}
           >
             Continue
-          </GoPasswordlessButtonComponent>
+          </ButtonComponent>
         </GoPasswordlessBaseComponent>
       );
     case "verify":
@@ -324,14 +201,16 @@ export const GoPasswordlessWidgetComponent = () => {
             onChange={(code) => setVerificationCode(code)}
             onKeyDown={handleKeyPress}
             error={error}
+            theme={settings.theme}
           />
-          <GoPasswordlessButtonComponent
+          <ButtonComponent
             onClick={handleVerifySubmit}
             type="button"
             loading={loading}
+            backgroundColour={settings.primaryColour}
           >
             Verify
-          </GoPasswordlessButtonComponent>
+          </ButtonComponent>
           <p style={{ fontSize: "12px" }}>
             Didn't receive a code?{" "}
             <span className="GoPasswordlessLink" onClick={resendCode}>
