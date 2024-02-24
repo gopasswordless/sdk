@@ -4,11 +4,11 @@ import {
   GoPasswordlessContextProvider,
   GoPasswordlessWidgetComponent,
   GoPasswordlessDrawerComponent,
-} from "./sdk";
+} from "@gopasswordless/sdk";
 
 export const App = (): JSX.Element => {
   const [mode, setMode] = useState<"light" | "dark" | "glass">("light");
-  const [showContainer, setShowContainer] = useState(window.innerWidth > 768);
+  const [showContainer, setShowContainer] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
