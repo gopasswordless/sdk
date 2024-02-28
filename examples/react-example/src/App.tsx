@@ -45,7 +45,7 @@ export const App = (): JSX.Element => {
     "https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo.png"
   );
   const [primaryColour, setPrimaryColour] = useState<string>("#027bff");
-  const [showContainer, setShowContainer] = useState(true);
+  const [showContainer, setShowContainer] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [selectedPreset, setSelectedPreset] = useState<string>(
     "GoPasswordless Light"
@@ -91,6 +91,28 @@ export const App = (): JSX.Element => {
       }}
     >
       <div className="App" style={{ gap: isMobile ? "2rem" : "0" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "200px",
+            height: "40px",
+          }}
+        >
+          <img
+            src={
+              !showContainer
+                ? `https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo-light.png`
+                : `https://gopasswordless.s3.eu-west-2.amazonaws.com/images/logo.png`
+            }
+            alt="GoPasswordless Logo"
+            style={{ height: "30px" }}
+          />
+        </div>
         <div
           className="Toggle"
           style={{ display: showContainer ? "none" : "block" }}
