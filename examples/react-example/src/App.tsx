@@ -76,24 +76,6 @@ export const App = (): JSX.Element => {
     return () => window.removeEventListener("resize", handleResize);
   }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
-  useEffect(() => {
-    const adjustAppHeight = () => {
-      const app = document.querySelector(".App") as HTMLElement;
-      if (app) {
-        app.style.height = `${window.innerHeight}px`;
-      }
-    };
-
-    // Adjust the height on initial load
-    adjustAppHeight();
-
-    // Adjust the height on resize events
-    window.addEventListener("resize", adjustAppHeight);
-
-    // Cleanup function to remove the event listener
-    return () => window.removeEventListener("resize", adjustAppHeight);
-  }, []);
-
   return (
     <GoPasswordlessContextProvider
       settings={{
