@@ -108,14 +108,7 @@ export const App = (): JSX.Element => {
           "https://gopasswordless.s3.eu-west-2.amazonaws.com/privacy.html",
       }}
     >
-      <div
-        className="App"
-        style={{
-          gap: isMobile ? "2rem" : "0",
-          position: "relative",
-          height: "100%",
-        }}
-      >
+      <div className="App" style={{ gap: isMobile ? "2rem" : "0" }}>
         <div
           style={{
             position: "absolute",
@@ -214,10 +207,7 @@ export const App = (): JSX.Element => {
             onChange={(e) => setPrimaryColour(e.target.value)}
           />
         </div>
-        <div
-          className="Container"
-          style={{ position: "relative", height: "100%" }}
-        >
+        <div className="Container">
           {!isMobile && <GoPasswordlessWidgetComponent />}
           {isMobile && <GoPasswordlessDrawerComponent />}
         </div>
