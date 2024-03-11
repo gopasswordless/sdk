@@ -6,6 +6,7 @@ import { VerificationCodeInput } from "../verification-code-input/verification-c
 import { InputComponent } from "../input/input.component";
 import { LinkComponent } from "../link/link.component";
 import { StyleSheetManager } from "styled-components";
+import { Drawer } from "vaul";
 
 const GoPasswordlessDrawerBaseComponent = ({
   children,
@@ -17,112 +18,121 @@ const GoPasswordlessDrawerBaseComponent = ({
   const shadowRootRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    setRender((prev) => prev + 1);
-  }, [shadowRootRef.current]);
+    // This forces render to happen after the shadow root has been added
+    // to the dom
+    setTimeout(() => {
+      setRender((prevRender) => prevRender + 1);
+    }, 100);
+  }, []);
 
   return (
-    <root.div ref={shadowRootRef}>
-      <div
-        data-vaul-no-drag="true"
-        style={{
-          height: "50%",
-          backgroundColor: `${
-            settings.theme === "dark"
-              ? "#06111f"
-              : settings.theme === "light"
-              ? "#ffffff"
-              : "rgba(255, 255, 255, 0.01)" /* Assuming "glass" mode has a slightly more opaque white */
-          }`,
-          position: "absolute",
-          bottom: "0",
-          left: "0",
-          right: "0",
-          boxSizing: "border-box",
-          border: `${
-            settings.theme === "glass"
-              ? "1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.1);" /* Shiny light effect for glass mode border */
-              : settings.theme === "light"
-              ? "1px solid #f1f1f1"
-              : "none"
-          }`,
-          borderRadius: "10px 10px 0 0",
-          padding: "60px 40px 20px 40px",
-          display: "flex",
-          justifyContent: "center",
-          color: `${
-            settings.theme === "dark"
-              ? "white"
-              : settings.theme === "light"
-              ? "black"
-              : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
-          }`,
-        }}
-      >
-        {shadowRootRef.current &&
-          shadowRootRef.current.shadowRoot &&
-          shadowRootRef.current.shadowRoot.firstElementChild && (
-            <StyleSheetManager
-              target={
-                shadowRootRef.current.shadowRoot
-                  .firstElementChild as HTMLElement
-              }
-              key={render}
+    <Drawer.Root open={true} dismissible={false} modal={false}>
+      <Drawer.Portal>
+        <root.div ref={shadowRootRef}>
+          <Drawer.Content>
+            <div
+              style={{
+                height: "40%",
+                backgroundColor: `${
+                  settings.theme === "dark"
+                    ? "#06111f"
+                    : settings.theme === "light"
+                    ? "#ffffff"
+                    : "rgba(255, 255, 255, 0.01)" /* Assuming "glass" mode has a slightly more opaque white */
+                }`,
+                position: "absolute",
+                bottom: "0",
+                left: "0",
+                right: "0",
+                boxSizing: "border-box",
+                border: `${
+                  settings.theme === "glass"
+                    ? "1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.1);" /* Shiny light effect for glass mode border */
+                    : settings.theme === "light"
+                    ? "1px solid #f1f1f1"
+                    : "none"
+                }`,
+                borderRadius: "10px 10px 0 0",
+                padding: "60px 40px 20px 40px",
+                display: "flex",
+                justifyContent: "center",
+                color: `${
+                  settings.theme === "dark"
+                    ? "white"
+                    : settings.theme === "light"
+                    ? "black"
+                    : "rgba(255, 255, 255, 0.7)" /* Assuming "glass" mode has a slightly more opaque white text */
+                }`,
+              }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  height: "100%",
-                  maxWidth: "440px",
-                }}
-              >
-                <img
-                  src={settings.appLogo}
-                  alt={settings.appName}
-                  style={{ width: "90%" }}
-                />
-                <div style={{ width: "100%" }}>{children}</div>
-                <div style={{ textAlign: "center" }}>
-                  {currentScreen === "login" && (
-                    <p style={{ fontSize: "12px" }}>
-                      By logging in you agree to our{" "}
-                      <LinkComponent
-                        href={settings.termsUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        color={settings.primaryColour}
-                      >
-                        Terms of Service
-                      </LinkComponent>{" "}
-                      and{" "}
-                      <LinkComponent
-                        href={settings.privacyUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        color={settings.primaryColour}
-                      >
-                        Privacy Policy
-                      </LinkComponent>
-                      .
-                    </p>
-                  )}
-                  {token && (
-                    <ButtonComponent
-                      onClick={logout}
-                      type="button"
-                      backgroundColour={settings.primaryColour}
+              {shadowRootRef.current &&
+                shadowRootRef.current.shadowRoot &&
+                shadowRootRef.current.shadowRoot.firstElementChild && (
+                  <StyleSheetManager
+                    target={
+                      shadowRootRef.current.shadowRoot
+                        .firstElementChild as HTMLElement
+                    }
+                    key={render}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "32px",
+                        justifyContent: "start",
+                        alignItems: "center",
+                        maxWidth: "440px",
+                      }}
                     >
-                      Logout
-                    </ButtonComponent>
-                  )}
-                </div>
-              </div>
-            </StyleSheetManager>
-          )}
-      </div>
-    </root.div>
+                      <img
+                        src={settings.appLogo}
+                        alt={settings.appName}
+                        style={{ maxHeight: "75px", maxWidth: "80%" }}
+                      />
+                      <div style={{ width: "100%" }}>{children}</div>
+                      <div style={{ textAlign: "center" }}>
+                        {currentScreen === "login" && (
+                          <p style={{ fontSize: "12px" }}>
+                            By logging in you agree to our{" "}
+                            <LinkComponent
+                              href={settings.termsUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              color={settings.primaryColour}
+                            >
+                              Terms of Service
+                            </LinkComponent>{" "}
+                            and{" "}
+                            <LinkComponent
+                              href={settings.privacyUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              color={settings.primaryColour}
+                            >
+                              Privacy Policy
+                            </LinkComponent>
+                            .
+                          </p>
+                        )}
+                        {token && (
+                          <ButtonComponent
+                            onClick={logout}
+                            type="button"
+                            backgroundColour={settings.primaryColour}
+                          >
+                            Logout
+                          </ButtonComponent>
+                        )}
+                      </div>
+                    </div>
+                  </StyleSheetManager>
+                )}
+            </div>
+          </Drawer.Content>
+        </root.div>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 };
 

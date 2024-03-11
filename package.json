@@ -1,7 +1,7 @@
 {
   "name": "@gopasswordless/sdk",
   "repository": "https://github.com/gopasswordless/sdk.git",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "",
   "source": "./src/index.ts",
   "main": "./dist/index.js",
@@ -29,6 +29,7 @@
     "jose": "^5.0.1",
     "react": "^18.2.0",
     "react-shadow": "^20.4.0",
-    "styled-components": "^6.1.8"
+    "styled-components": "^6.1.8",
+    "vaul": "^0.9.0"
   }
 }
