@@ -91,3 +91,9 @@
 .Toggle:active:after {
   transform: translateY(-9px) rotate(-45deg);
 }
+
+.ToggleMobile:before,
+.ToggleMobile:after,
+.ToggleMobile div {
+  background-color: black;
+}

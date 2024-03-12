@@ -3,7 +3,6 @@ import "./App.css";
 import {
   GoPasswordlessContextProvider,
   GoPasswordlessWidgetComponent,
-  GoPasswordlessDrawerComponent,
 } from "@gopasswordless/sdk";
 
 const presets = [
@@ -90,7 +89,12 @@ export const App = (): JSX.Element => {
           "https://gopasswordless.s3.eu-west-2.amazonaws.com/privacy.html",
       }}
     >
-      <div className="App" style={{ gap: isMobile ? "2rem" : "0" }}>
+      <div
+        className="App"
+        style={{
+          backgroundColor: isMobile && showContainer ? "white" : "transparent",
+        }}
+      >
         <div
           style={{
             position: "absolute",
@@ -114,8 +118,8 @@ export const App = (): JSX.Element => {
           />
         </div>
         <div
-          className="Toggle"
-          style={{ display: showContainer ? "none" : "block" }}
+          className={`Toggle ${showContainer ? "ToggleMobile" : ""}`}
+          style={{ display: isMobile ? "block" : "none" }}
           onClick={() => setShowContainer(!showContainer)}
         />
         <div
@@ -125,30 +129,17 @@ export const App = (): JSX.Element => {
             flexDirection: "column",
             height: "100%",
             backgroundColor: "white",
-            padding: "0 2rem",
-            justifyContent: "center",
+            padding: "0rem 2rem",
+            justifyContent: isMobile ? "start" : "center",
             alignItems: "start",
-            maxWidth: "calc(100vw - 4rem)",
-            paddingTop: isMobile ? "1rem" : "0",
+            maxWidth: isMobile ? "100%" : "calc(100vw - 4rem)",
+            position: isMobile ? "absolute" : "relative",
+            top: isMobile ? "50px" : 0,
+            left: 0,
+            zIndex: 1000,
+            paddingTop: isMobile ? "2rem" : "0rem",
           }}
         >
-          {isMobile && (
-            <button
-              style={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-                background: "none",
-                border: "none",
-                fontSize: "1.5rem",
-                color: "#333",
-                cursor: "pointer",
-              }}
-              onClick={() => setShowContainer(false)}
-            >
-              &times;
-            </button>
-          )}
           <h2>See how your app could look with GoPasswordless</h2>
           <p>
             Play around with our configurations to see how you can customise the
@@ -190,8 +181,7 @@ export const App = (): JSX.Element => {
           />
         </div>
         <div className="Container">
-          {!isMobile && <GoPasswordlessWidgetComponent />}
-          {isMobile && <GoPasswordlessDrawerComponent />}
+          <GoPasswordlessWidgetComponent />
         </div>
       </div>
     </GoPasswordlessContextProvider>
