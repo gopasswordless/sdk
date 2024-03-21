@@ -1,7 +1,7 @@
 {
   "name": "@gopasswordless/sdk",
   "repository": "https://github.com/gopasswordless/sdk.git",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "",
   "source": "./src/index.ts",
   "main": "./dist/index.js",
@@ -9,8 +9,7 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "dev": "parcel watch --no-cache",
-    "build": "parcel build --no-cache",
+    "build": "rollup -c rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -18,9 +17,12 @@
   "devDependencies": {
     "@parcel/packager-ts": "^2.10.1",
     "@parcel/transformer-typescript-types": "^2.10.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@simplewebauthn/typescript-types": "^8.3.4",
     "@types/react": "^18.2.47",
-    "parcel": "^2.10.1",
+    "rollup": "^4.13.0",
+    "rollup-plugin-ts": "^3.4.5",
     "typescript": "^5.2.2"
   },
   "dependencies": {
